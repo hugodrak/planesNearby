@@ -1,0 +1,169 @@
+Alingsås;ESGI;;Alingsås Airport;Public;01/19, 800 m, Grass
+Anderstorp;ESMP;;Anderstorp Airport;Public;04/22, 1000 m, Asphalt
+Arboga;ESQO;;Arboga Airport;Public;15/33, 2000 m, Asphalt
+Arbrå;ESUB;;Arbrå Airport;Public;18/36, 700 m, Grass
+Arvidsjaur;ESNX;AJR;Arvidsjaur Airport;Public;12/30, 2500 m, Asphalt;42,494
+Arvika;ESKV;;Arvika–Westlanda Airport;Public;01/19, 1150 m, Asphalt
+Avesta;ESVA;;Avesta Airport;Public;15/33, 850 m, Grass
+Berga;ESQP;;Berga Airport;Military;183 m, Paved
+Björkvik;ESKX;;Björkvik Airbase;Military;2000 m, Paved
+Boden;ESPG;;Boden Army Airbase (closed);Military;406 m, Paved
+Borgholm;ESMB;;Borglanda Airport;Public;03/21, 625 m, Grass
+Borlänge;ESSD;BLE;Borlänge Airport (Dala Airport);Public;14/32, 2310 m, Asphalt;33,811
+Borås;ESGE;;Viared Airport;Public;04/22, 800 m, Asphalt
+Brattforsheden;ESSM;;Brattforsheden Airport;Public;08/26, 800 m, Grass
+Bunge;ESVB;;Bunge Airbase;Military;09/27, 675 m, Asphalt, 16/34, 675 m, Asphalt
+Byholma;ESFY;;Byholma Airbase;Military;12/30, 2300 m, Asphalt
+Dala-Järna;ESKD;;Dala-Järna Airport;Public;03/21, 900 m, Asphalt
+Edsbyn;ESUY;;Edsbyn Airport;Public;11/29, 700 m, Grass
+Ekshärad;ESKH;;Ekshärad Airport;Public;15/33, 540 m, Grass
+Eksjö;ESMC;;Ränneslätt Airport;Public;01/19, 1000 m, Grass
+Emmaboda;ESMA;;Emmaboda Airport;Public;01/19, 1300 m, Asphalt
+Eskilstuna;ESSC;;Ekeby Airport;Public;05/23, 850 m, Grass, 17/35, 800 m, Grass
+Eskilstuna;ESSU;EKT;Eskilstuna Airport;Public;18/36, 1886 m, Asph./Conc.
+Eslöv;ESME;;Eslöv Airport;Public;04/22, 630 m, Grass, 15/33, 650 m, Grass
+Skånes-Fagerhult;ESMF;;Fagerhult Airport;Public;17/35, 530 m, Grass
+Falkenberg;ESGF;;Morup Airport;Public;09/27, 700 m, Grass
+Falköping;ESGK;;Falköping Airport;Public;04/22, 1316 m, Asphalt
+Fällfors;ESUF;;Fällfors Airbase;Military;2000 m, Paved
+Färila;ESNF;;Färila Airbase;Military;2000 m, Paved
+Fjällbacka;ESTF;;Fjällbacka Airport;Public;06/24, 800 m, Grass
+Gagnef;ESVG;;Gagnef Airport;Public;08/26, 600 m, Grass
+Gargnäs;ESUG;;Gargnäs Airport;Public;17/35, 940 m, Grass
+Gimo;ESKA;;Lunda Airfield;Public;05/23, 800 m, Paved
+Gothenburg;ESGG;GOT;Göteborg Landvetter Airport;Public;03/21, 3299 m, Paved;6,758,520
+Gothenburg;ESGP;GSE;Göteborg City Airport (Säve);Public;01/19, 2039 m, Asphalt, 04/22, 871 m, Asphalt closed;714,798
+Gryttjom;ESKG;;Gryttjom Airport;Public;18/36, 900 m, Grass
+Grönhögen;ESTG;;Grönhögen Airport;Private;01/19, 800 m, Grass
+Gällivare;ESNG;GEV;Gällivare Airport;Public;12/30, 1714 m, Asphalt;34,106
+Gävle / Sandviken;ESSK;GVX;Gävle–Sandviken Airport;Public;18/36, 2000 m, Asphalt
+Götene;ESGN;;Brännebrona Airport;Public;12/30, 600 m, Grass
+Hagfors;ESOH;HFS;Hagfors Airport;Public;18/36, 1509 m, Asphalt;3,392
+Hagshult;ESMV;;Hagshult Airbase;Military;04/22, 2050 m, Asphalt
+Hallviken;ESNA;;Hallviken Airport;Public;14/32, 100 m, Asphalt
+Halmstad;ESMT;HAD;Halmstad City Airport;Public;01/19, 2261 m, Asphalt;93,640
+Hasslosa;ESFH;;Hasslosa Airbase;Military;2000 m, Paved
+Hede;ESNC;;Hedlanda Airport;Public;06/24, 1000 m, Asphalt
+Heden;ESPJ;;Heden Airbase;Military;2000 m, Paved
+Hemavan;ESUT;HMV;Hemavan Airport;Public;15/33, 1472 m, Asphalt;10,733
+Herrljunga;ESGH;;Herrljunga Airport;Public;18/36, 900 m, Grass
+Hudiksvall;ESNH;HUV;Hudiksvall Airport;Public;12/30, 1320 m, Asphalt
+Hultsfred / Vimmerby;ESSF;HLF;Hultsfred–Vimmerby Airport;Public;12/30, 1945 m, Concrete
+Hällefors;ESVH;;Hällefors Airport;Public;18/36, 720 m, Gravel
+Härnösand;ESUH;;Myran Airport;Public;10/28, 800 m, Gravel
+Hässleholm;ESFA;;Bokeberg Airport;Public;04R/22L, 830 m, Grass, 04L/22R, 1110 m, Grass
+Hässleholm;ESMD;;Vankiva Airport;Private;15/33, 670 m, Unpaved
+Höganäs;ESMH;;Höganäs Airport;Public;06/24, 510 m, Grass, 14/32, 800 m, Grass
+Idre;ESUE;IDB;Idre Airport;Private;15/33, 1558 m, Asphalt
+Jokkmokk;ESNJ;;Jokkmokk Airbase;Military;14/32, 1311 m, Asphalt
+Jönköping;ESGJ;JKG;Jönköping Airport;Public;01/19, 2203 m, Asphalt, 11/29, 600 m, Grass;73,000
+Kalixfors;ESUK;;Kalixfors Army Airbase;Military;05/23, 900 m, Asphalt, 11/29, 880 m, Asphalt, 17/35, 1200 m, Asphalt
+Kalmar;ESMQ;KLR;Kalmar Airport;Public;16/34, 2050 m, Asphalt, 05/23, 980 m, Asphalt;166,461
+Karlsborg;ESIA;;Karlsborg Airbase;Military;06/24, 2300 m, Asphalt
+Karlskoga;ESKK;KSK;Karlskoga Airport;Public;03/21, 1499 m, Asphalt
+Karlstad;ESOK;KSD;Karlstad Airport;Public;03/21, 2516 m, Asphalt;82,423
+Katrineholm;ESVK;;Katrineholm Airport;Public;15/33, 700 m, Grass
+Kiruna;ESNQ;KRN;Kiruna Airport;Public;03/21, 2502 m, Asphalt;282,412
+Knislinge;ESFI;;Knislinge Airbase;Military;2100 m, Paved
+Kosta;ESFQ;;Kosta Airbase;Military;2000 m, Paved
+Kramfors;ESNK;KRF;Höga Kusten Airport (Kramfors-Sollefteå);Public;17/35, 2001 m, Asphalt;21,634
+Kristianstad;ESMK;KID;Kristianstad Airport (Kristianstad Österlen Airport);Public;01/19 2,215 m Asphalt;38,394
+Kubbe;ESNI;;Kubbe Airbase;Military;2300 m, Paved
+Kungsängen/Stockholm;ESVF;;Frölunda Airport;Public;750 m, Grass
+Kågeröd;ESMJ;;Kågeröd Airport;Public;11/29, 800 m, Grass
+Köping;ESVQ;;Köping Airport;Public;07/25, 700 m, Grass
+Landskrona;ESML;;Landskrona Airport;Public;12R/30L, 1180 m, Asphalt, 12L/30R, 1050 m, Grass
+Laxå;ESSH;;Laxå Airport;Public;03/21, 900 m, Asphalt
+Lidköping;ESGL;LDK;Lidköping–Hovby Airport;Public;06/24, 1990 m, Asphalt
+Linköping;ESCF;;Malmen Airbase;Military;01/19, 2214 m, Asphalt, 08/26, 1870 m, Asphalt
+Linköping;ESSL;LPI;Linköping/Saab Airport;Public;11/29, 2130 m, Asphalt;91,521
+Ljungby;ESMG;;Feringe Airport;Public;01/19, 1150 m, Asphalt
+Ljungbyhed;ESTL;;Ljungbyhed Airport;Public;11L/29R, 2010 m, Asphalt, 11R/29L, 2214 m, Asphalt
+Ljusdal;ESUL;;Ljusdal Airport;Public;09/27, 620 m, Grass
+Ludvika;ESSG;;Ludvika Airport;Public;01/19, 819 m, Paved
+Luleå;ESPA;LLA;Luleå Airport (Kallax Airbase);Public/Mil.;14/32, 3350 m, Asphalt;1,204,535
+Lund;ESMN;;Lund Airport;Public;03/31, 630 m, Grass
+Lycksele;ESNL;LYC;Lycksele Airport;Public;14/32, 2090 m, Asphalt;21,460
+Malmö;ESMS;MMX;Malmö Airport;Public;17/35, 2800 m, Asphalt, 11/29, 797 m, Asphalt;2,185,485
+Malung;ESVM;;Skinnlanda Airport;Public;16/34, 800 m, Asphalt
+Mellansel;ESUI;;Mellansel Airport;Public;09/27, 795 m, Grass
+Mohed;ESUM;;Mohed Airport;Public;12/30, 800 m, Asphalt
+Moholm;ESFM;;Moholm Airbase;Military;2002 m, Paved
+Mora;ESKM;MXX;Mora–Siljan Airport;Public;16/34, 1814 m, Asphalt;8,144
+Munkfors;ESKO;;Munkfors Airport;Public;03/21, 700 m, Grass
+Norrköping;ESSP;NRK;Norrköping Airport;Public;09/27, 2203 m, Asphalt, 11/29, 600 m, Grass;115,660
+Norrköping;ESCK;;Bråvalla Airbase;Military;15/33, 2300 m, Asphalt
+Norrtälje;ESSN;;Mellingeholm Airport;Public;07/25, 605 m, Asphalt
+Optand;ESNM;;Optand Airport;Public;18/36, 1000 m, Asphalt, 15/33, 750 m, Grass
+Orsa;ESNR;;Orsa Airport;Public;03/21, 1000 m, Asphalt, 15/33, 900 m, Grass
+Oskarshamn;ESMO;OSK;Oskarshamn Airport;Public;01/19, 1500 m, Asphalt;11,742
+Oviken;ESUO;;Oviken Airport;Public;18/36, 900 m, Grass
+Pajala;ESUP;PJA;Pajala Airport;Public;11/29, 1420 m, Asphalt;2,651
+Piteå;ESNP;;Piteå Airport;Public;16/34, 1000 m, Asphalt
+Ramsele;ESUR;;Ramsele Airport;Public;14/32, 740 m, Grass
+Ronneby;ESDF;RNB;Ronneby Airport (F 17);Public/Mil.;01/19, 2331 m, Asphalt;237,695
+Råda;ESFR;;Råda Airbase;Military;18/36, 2000 m, Asphalt
+Sandvik;ESFS;;Sandvik Airport;Public;17/35, 600 m, Grass
+Sattna;ESNT;;Sattna Airbase;Military;2000 m, Paved
+Siljansnäs;ESVS;;Siljansnäs Airport;Public;14R/32L, 850 m, Asphalt, 14L/32R, 850 m, Grass
+Sjöbo;ESFJ;;Sjöbo Airbase;Military;2000 m, Paved
+Skellefteå;ESNS;SFT;Skellefteå Airport;Public;10/28, 2100 m, Asphalt;224,477
+Skövde;ESGR;KVB;Skövde Airport;Public;01/19, 1736 m, Asphalt
+Smålandsstenar;ESMY;;Smålandsstenar Airport;Public;04/22, 800 m, Asphalt
+Sollefteå;ESNB;;Sollefteå Airport;Public;14/32, 820 m, Asphalt
+Stockholm / Nyköping;ESKN;NYO;Stockholm–Skavsta Airport;Public;08/26, 2878 m, Asphalt, 16/34, 2039 m, Asphalt;2,507,772
+Stockholm / Västerås;ESOW;VST;Stockholm–Västerås Airport (Hasslo);Public;01/19, 2581 m, Asphalt;150,793
+Stockholm;ESCN;;Tullinge Airport (closed);Public;2347 m, Paved
+Stockholm;ESKB;;Barkarby Airport (closed);Public;06/24, 990 m, Asphalt
+Stockholm;ESSA;ARN;Stockholm–Arlanda Airport;Public;01L/19R, 3301 m, Conc./Asph., 01R/19L, 2500 m, Asphalt, 08/26, 2500 m, Conc./Asph.;26,642,034
+Stockholm;ESSB;BMA;Stockholm–Bromma Airport;Public;12/30, 1668 m, Asphalt;2,535,859
+Stockholm;ESSE;;Skå-Edeby Airport;Public;03/21, 650 m, Grass, 11/29, 800 m, Grass
+Storuman;ESUD;SQO;Storuman Airport;Public;15/33, 2283 m, Asph./Conc.;2,818
+Storvik;ESOL;;Lemstanäs Airport;Public;06/24, 620 m, Asphalt
+Strängnäs;ESKS;;Strängnäs Airbase;Military;2000 m, Paved
+Strömstad;ESGS;;Näsinge Airport;Public;03/21, 906 m, Grass
+Sundbro;ESKC;;Sundbro Airport;Public;03/21, 630 m, Grass, 08/26, 470 m, Grass, 14/32, 435 m, Grass
+Sundsvall / Härnösand;ESNN;SDL;Sundsvall–Timrå Airport;Public;16/34, 1950 m, Asphalt;256,132
+Sunne;ESKU;;Sunne Airport;Public;01/19, 770 m, Grass
+Sveg;ESND;EVG;Sveg Airport;Public;09/27, 1700 m, Asphalt;5,697
+Säffle;ESGY;;Säffle Airport;Private;01/19, 870 m, Grass
+Sälen / Trysil;;;Scandinavian Mountains Airport (Sälen Trysil Airport);Public;2500 m, Asphalt
+Såtenäs;ESIB;;Såtenäs Airbase;Military;01/19, 2264 m, Asphalt, 11/29, 1933 m, Asphalt
+Söderhamn;ESNY;SOO;Söderhamn Airport;Public;12/30, 2524 m, Asphalt
+Sövdeborg;ESMI;;Sövdeborg Airport;Public;12/30, 800 m, Grass
+Tidaholm;ESGD;;Bämmelshed Airport;Public;04/2, 675 m, Grass
+Tierp;ESKT;;Tierp Airport;Public;16/34, 1000 m, Asphalt
+Tingsryd;ESMW;;Tingsryd Airport (closed);Public;610 m, Unpaved
+Tomelilla;ESTO;;Tomelilla Airport;Public;09/27, 840 m, Grass
+Torsby;ESST;TYF;Torsby Airport (Fryklanda Airport);Public;16/34, 1591 m, Asphalt;2,955
+Trelleborg;ESMR;;Trelleborg Airport (Maglarp Airport);Public;12/30, 600 m, Unpaved
+Trollhättan / Vänersborg;ESGT;THN;Trollhättan–Vänersborg Airport;Public;15/33, 1710 m, Asphalt;39,603
+Uddevalla;ESGA;;Backamo Airport;Public;06/24, 760 m, Grass
+Uddevalla;ESGU;;Rörkärr Airport;Public;03/21, 655 m, Grass
+Umeå;ESNU;UME;Umeå Airport;Public;14/32, 2302 m, Asphalt;1,055,353
+Uppsala;ESCM;;Uppsala Airport / Ärna Airbase (F 16);Public/Mil.;03/21, 1905 m, Asphalt, 08/26, 2010 m, Asphalt
+Varberg;ESGV;;Varberg Airport;Public;06/24, 600 m, Grass, 12/30, 600 m, Grass
+Vellinge;ESTT;;Vellinge Airport;Public;03/21, 800 m, Grass
+Vidsel;ESPE;;Vidsel Airbase;Military;11/29, 2230 m, Asphalt
+Vilhelmina;ESNV;VHM;Vilhelmina Airport;Public;10/28, 1502 m, Asphalt;13,908
+Visby;ESSV;VBY;Visby Airport;Public;03/21, 2000 m, Asphalt, 10/28, 1100 m, Grass;491,446
+Visingsö;ESSI;;Visingsö Airport;Public;01/19, 600 m, Grass, 15/33, 800 m, Grass
+Vårgårda;ESGO;;Vårgårda Airport;Private;04/22, 700 m, Asphalt
+Vängsö;ESSZ;;Vängsö Airport;Public;03/21, 630 m, Grass, 15/33, 620 m, Grass
+Västervik;ESSW;VVK;Västervik Airport;Public;15L/33R, 800 m, Asphalt, 15R/33L, 800 m, Grass
+Västerås;ESSX;;Johannisberg Airport;Public;05/23, 850 m, Asphalt
+Växjö;ESFU;;Urasa Airbase;Military;2300 m, Paved
+Växjö;ESMX;VXO;Växjö/Kronoberg Airport;Public;01/19, 2103 m, Asphalt;162,875
+Älmhult;ESMU;;Möckeln Airport;Public;03/21, 604 m, Grass
+Älvsbyn;ESUV;;Älvsbyn Airport;Public;04/22, 730 m, Grass
+Ängelholm / Helsingborg;ESTA;AGH;Ängelholm–Helsingborg Airport;Public;14/32, 1945 m, Asphalt;376,234
+Ålleberg;ESGC;;Ålleberg Airport;Public;03/21, 550 m, Grass
+Åmsele;ESUA;;Åmsele Airbase;Military;2041 m, Paved
+Ånge;ESUJ;;Tälje Airport;Public;14/32, 720 m, Grass
+Åsele;ESUS;;Åsele Airport;Public;12/30, 1200 m, Grass
+Ölanda;ESMZ;;Ölanda Airport;Public;15/33, 600 m, Asphalt
+Örebro;ESOE;ORB;Örebro Airport;Public;01/19, 2602 m, Asphalt;68,517
+Öresten;ESGM;;Öresten Airport;Public;06/24, 680 m, Grass
+Örnsköldsvik;ESNO;OER;Örnsköldsvik Airport;Public;12/30, 2014 m, Asphalt;86,283
+Östersund;ESNZ;OSD;Åre Östersund Airport (F4 Frösön Airbase);Public;12/30, 2500 m, Asphalt;530,983
+Överkalix;ESNE;;Överkalix Airport;Public;05/23, 900 m, Grass

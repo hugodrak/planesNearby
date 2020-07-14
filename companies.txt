@@ -1,0 +1,14 @@
+SAS;Scandinavian
+APF;Amapola
+FIN;Finair
+DFL;Babcock AirAmbulance
+LPA;Air Leap
+QTR;Quatar Airways
+ATO;UTBILDNING
+SCQ;UTBILDNING
+HMF;Lifeguard
+INU;Volflight
+VLG;Vueling
+TVS;Smart Wings
+IBE;Iberia
+BAW;British Airways
