@@ -5,6 +5,7 @@ import os
 import argparse
 import geocoder
 from geopy.distance import distance
+from weather_calc import cloud_get
 
 
 def parse_args():
@@ -113,12 +114,13 @@ def print_stats(prev, limit, val, signs, unit, var, max=None):
     p_delta = abs(round(delta, 2))
     if type(val) == int:
         val = format(val, ",d")
-    if delta == 0:
-        out = f"{var}: {val}{unit} |{' '*len(signs[1])} {p_delta}{unit}"
-    elif delta < 0:
+
+    if delta < -0.01:
         out = f"{var}: {val}{unit} |{signs[1]} {p_delta}{unit}"
-    else:
+    elif delta > 0.01:
         out = f"{var}: {val}{unit} |{signs[0]} {p_delta}{unit}"
+    else:
+        out = f"{var}: {val}{unit} |{' '*len(signs[1])} {p_delta}{unit}"
 
     return out
 
@@ -150,7 +152,7 @@ def lookup_company(company):
 
 
 class Plane:
-    def __init__(self, data):
+    def __init__(self, data, cloud_height):
         self.key = data[0]
         self.type = lookup_type(data[8])
         self.squawk = data[6]
@@ -165,6 +167,7 @@ class Plane:
         self.speed = data[5]
         self.departure = lookup_airport(data[11])
         self.destination = lookup_airport(data[12])
+        self.cloud_height = cloud_height
         self.flightno = data[13]
         self.callsign = data[16]
         self.dist_to_me = 0
@@ -213,7 +216,7 @@ class Plane:
             self.stats[5] = speed_s
         dist_s = print_stats(self.prev[6], 0.01, self.dist_to_me, ["▼", "▲"], "km", "DIST")
         if dist_s != "":
-            if self.dist_to_me < 10: # 15 km
+            if self.dist_to_me < 15: # 15 km
                 if not self.has_passed:
                     self.passed_me = [self.key, self.time, self.type, self.reg, self.departure, self.destination, self.height]
                     self.has_passed = True
@@ -221,7 +224,14 @@ class Plane:
                     self.passed_me = []
                 dist_s += "$G"
             self.stats[11] = dist_s
-        self.stats[12] = "LOOK TO: " + self.direction_rel_to_me
+
+        cloud_status = " | ▲ ☁"
+        if self.height < self.cloud_height:
+            cloud_status = " | ▼ ☁"
+            if self.has_passed:
+                cloud_status += "$G"
+
+        self.stats[12] = "LOOK TO: " + self.direction_rel_to_me + cloud_status
 
     def set_prev(self):
         self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
@@ -232,6 +242,7 @@ def get_data(bbox=None, read_log=None, create_log=None):
     planes = {}
     old_keys = {}
     my_pos = get_my_position()
+    weather = cloud_get(my_pos)
 
     if bbox:
         url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={bbox}&faa=1&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1&maxage=14400&gliders=1&stats=1&enc=WPix0NeDQJ6xOmiczStTqq2XtL_YRMqUg86w4siPKdQ"
@@ -243,30 +254,35 @@ def get_data(bbox=None, read_log=None, create_log=None):
             w_log = None
 
         passed_log = open("passed.log" , "a")
-        while True:
-            try:
-                resp = sess.get(url, headers=headers)
-            except:
-                print("Connection broke, retrying...")
-                time.sleep(5)
-                continue
-            if resp.status_code != 200:
-                print(f"Status {resp.status_code}")
-                time.sleep(5)
-                continue
+        try:
+            while True:
+                try:
+                    resp = sess.get(url, headers=headers)
+                except:
+                    print("Connection broke, retrying...")
+                    time.sleep(5)
+                    continue
+                if resp.status_code != 200:
+                    print(f"Status {resp.status_code}")
+                    time.sleep(5)
+                    continue
 
-            planes, old_keys, planes_passed = run_iteration(resp.text, planes, old_keys, w_log, my_pos)
-            if planes_passed:
-                passed_log.write("".join([str(plane)+"\n" for plane in planes_passed]))
-            time.sleep(3)
+                planes, old_keys, planes_passed = run_iteration(resp.text, planes, old_keys, w_log, my_pos, weather=weather)
+                if planes_passed:
+                    passed_log.write("".join([str(plane)+"\n" for plane in planes_passed]))
+                time.sleep(3)
+        except KeyboardInterrupt:
+            print("\tI am done. Have a nice day! :)")
+            pass
+            
     elif read_log:
         r_log = open(read_log, "r").read().split("}}}")[:-1]
         for row in r_log:
-            planes, old_keys, planes_passed = run_iteration(row+"}}}", planes, old_keys, my_pos=my_pos)
+            planes, old_keys, planes_passed = run_iteration(row+"}}}", planes, old_keys, my_pos=my_pos, weather=weather)
             time.sleep(3)
         print("LOG END")
 
-def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None):
+def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0):
     if w_log:
         w_log.write(resp+"\n")
     json_data = json.loads(resp)
@@ -281,7 +297,7 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None):
                 planes[key].get_change()
                 planes[key].set_prev()
             else:
-                planes[key] = Plane(data)
+                planes[key] = Plane(data, weather[0])
             p_count.append(key)
 
     for key in planes.keys():
@@ -303,7 +319,7 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None):
 
     planes_list = [plane for _, plane in planes.items()]
     planes_list.sort(key=lambda x: x.callsign, reverse=False)
-    plane_stats = [plane.stats for plane in planes_list]+[["Planes", f"No. {len(planes_list)}", f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}"]]
+    plane_stats = [plane.stats for plane in planes_list]+[["Planes", f"✈ No. {len(planes_list)}", f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}", f"CLOUD FLOOR: {int(weather[0])} ft", f"TEMP: {int(weather[1])} °C",  f"HUMIDITY: {int(weather[2])} %"]]
     print_blocks(plane_stats)
     return planes, old_keys, [plane.passed_me for plane in planes_list if plane.passed_me]
 

@@ -1,3 +1,4 @@
 log.*
 *.log
 .DS_store
+__pycache__/

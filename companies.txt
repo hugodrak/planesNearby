@@ -15,3 +15,4 @@ IBE;Iberia
 BAW;British Airways
 AFR;Air France
 ICE;Iceland Air
+NAX;Norwegian
