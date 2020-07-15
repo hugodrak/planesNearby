@@ -3,16 +3,47 @@ import requests
 import time
 import os
 import argparse
+import geocoder
+from geopy.distance import distance
+
 
 def parse_args():
     parser= argparse.ArgumentParser()
-    parser.add_argument("--bbox", default="59.781238,58.654034,15.793447,19.970999")
+    parser.add_argument("--mode", required=True, help="online or log")
+    parser.add_argument("--bbox", default="59.781238,58.654034,15.793447,19.970999", help="59.78,58.65,15.79,19.97")
+    parser.add_argument("--log-path", default="log.txt", help="path to log file")
+    parser.add_argument("--write-log", default=None, help="path to log that will be created")
+
     return parser.parse_args()
 
 
 block_width = 30
 rows, columns = os.popen('stty size', 'r').read().split()
 blocks_wide = int(columns) // block_width
+
+def get_my_position():
+    g = geocoder.ip('me')
+    return g.latlng
+
+
+def calc_gps_distace(my_coord, second_coord):
+    dist = round(distance(my_coord, second_coord).m*0.001, 2)
+    direction = ""
+    ns_tuning = 0.002
+    ew_tuning = 0.002
+    if abs(my_coord[0] - second_coord[0]) > dist*ns_tuning:
+        if my_coord[0] < second_coord[0]:
+            direction += "N"
+        else:
+            direction += "S"
+    if abs(my_coord[1] - second_coord[1]) > dist*ew_tuning:
+        if my_coord[1] < second_coord[1]:
+            direction += "E"
+        else:
+            direction += "W"
+
+    return dist, direction
+
 
 def get_color(code):
     colors = {"B": '\033[94m', "G": '\033[92m', "W": '\033[93m', "F": '\033[91m', "END": '\033[0m', "BOLD": '\033[1m', "UNDER": '\033[4m', "M": '\033[95m'}
@@ -36,12 +67,13 @@ def print_blocks(blocks):
         if len(block) > 1:
             data_list = []
             for val in block[1:]:
+                val = str(val)
                 if "$" in val:
                     val_split = val.split("$")
                     color = get_color(val_split[1])
-                    data_list.append(f'|{color}'+add_margin(str(val_split[0]), block_width-2, " ")+f'{get_color("END")}|')
+                    data_list.append(f'|{color}'+add_margin(val_split[0], block_width-2, " ")+f'{get_color("END")}|')
                 else:
-                    data_list.append('|'+add_margin(str(val), block_width-2, " ")+'|')
+                    data_list.append('|'+add_margin(val, block_width-2, " ")+'|')
             data = "\n".join(data_list)
         else:
             data = '|'+add_margin("", block_width-2, " ")+'|'
@@ -77,14 +109,17 @@ def print_stats(prev, limit, val, signs, unit, var, max=None):
         else:
             delta = prev-val
 
-    if abs(delta) > limit:
-        p_delta = abs(round(delta, 2))
-        if type(val) == int:
-            val = format(val, ",d")
-        if delta < 0:
-            out = f"{var}: {val}{unit}|{signs[1]} {p_delta}{unit}"
-        else:
-            out = f"{var}: {val}{unit}|{signs[0]} {p_delta}{unit}"
+    # if abs(delta) > limit:
+    p_delta = abs(round(delta, 2))
+    if type(val) == int:
+        val = format(val, ",d")
+    if delta == 0:
+        out = f"{var}: {val}{unit} |{' '*len(signs[1])} {p_delta}{unit}"
+    elif delta < 0:
+        out = f"{var}: {val}{unit} |{signs[1]} {p_delta}{unit}"
+    else:
+        out = f"{var}: {val}{unit} |{signs[0]} {p_delta}{unit}"
+
     return out
 
 def lookup_type(type):
@@ -116,6 +151,7 @@ def lookup_company(company):
 
 class Plane:
     def __init__(self, data):
+        self.key = data[0]
         self.type = lookup_type(data[8])
         self.squawk = data[6]
         self.company = lookup_company(data[18])
@@ -131,10 +167,18 @@ class Plane:
         self.destination = lookup_airport(data[12])
         self.flightno = data[13]
         self.callsign = data[16]
-        self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed]
-        self.stats = [f"{self.callsign}/{self.flightno}","CRS$B","LAT$B","LON$B","LVL$B","SPD$B", "ONLINE$G", self.departure, self.destination, self.type, self.company]
+        self.dist_to_me = 0
+        self.direction_rel_to_me = ""
+        self.passed_me = []
+        self.has_passed = False
+        self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
+        self.stats = [f"{self.callsign}/{self.flightno}","CRS$B","LAT$B","LON$B","LVL$B","SPD$B", "ONLINE$G", self.departure, self.destination, self.type, self.company, "DIST", "LOOK TO"]
 
-    def update(self, data):
+    def update(self, data, my_pos):
+        if my_pos:
+            dist, direction = calc_gps_distace(my_pos, (self.lat, self.lon))
+            self.dist_to_me = dist
+            self.direction_rel_to_me = direction
         self.time = data[10]
         self.lat = data[1]
         self.lon = data[2]
@@ -147,36 +191,47 @@ class Plane:
         course_s = print_stats(self.prev[3], 0, self.course, ["CCW", "CW"], "°", "CRS", max=360)
         if course_s != "":
             self.stats[1] = course_s
+
         lat_s = print_stats(self.prev[1], 0.005, self.lat, ["◀", "▶"], "°", "LAT")
         if lat_s != "":
             self.stats[2] = lat_s
+
         lon_s = print_stats(self.prev[2], 0.005, self.lon, ["▼", "▲"], "°", "LON")
         if lon_s != "":
             self.stats[3] = lon_s
-        height_s = print_stats(self.prev[4], 10, self.height, ["▼", "▲"], "ft", "LVL")
-        if height_s != "":
-            self.stats[4] = height_s
-        if self.speed > 0.5:
-            speed_s = print_stats(self.prev[5], 1, self.speed, ["▼", "▲"], "kn", "SPD")
+
+        if self.height < 20:
+            self.stats[4] = "ON GROUND$W"
         else:
-            speed_s = "0"
+            height_s = print_stats(self.prev[4], 10, self.height, ["▼", "▲"], "ft", "LVL")
+            if height_s != "":
+                self.stats[4] = height_s
+
+
+        speed_s = print_stats(self.prev[5], 1, self.speed, ["▼", "▲"], "kn", "SPD")
         if speed_s != "":
             self.stats[5] = speed_s
+        dist_s = print_stats(self.prev[6], 0.01, self.dist_to_me, ["▼", "▲"], "km", "DIST")
+        if dist_s != "":
+            if self.dist_to_me < 10: # 15 km
+                if not self.has_passed:
+                    self.passed_me = [self.key, self.time, self.type, self.reg, self.departure, self.destination, self.height]
+                    self.has_passed = True
+                else:
+                    self.passed_me = []
+                dist_s += "$G"
+            self.stats[11] = dist_s
+        self.stats[12] = "LOOK TO: " + self.direction_rel_to_me
 
     def set_prev(self):
-        self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed]
+        self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
     def update_conn(self, conn):
         self.stats[6] = conn
-    def lookup_type(self, type):
-        rows = open("./type_design.txt", "r").read().splitlines()
-        for row in rows:
-            rowsplit = row.split(";")
-            if type in [rowsplit[0], rowsplit[1]]:
-                self.type = rowsplit[2]
 
 def get_data(bbox=None, read_log=None, create_log=None):
     planes = {}
     old_keys = {}
+    my_pos = get_my_position()
 
     if bbox:
         url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={bbox}&faa=1&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1&maxage=14400&gliders=1&stats=1&enc=WPix0NeDQJ6xOmiczStTqq2XtL_YRMqUg86w4siPKdQ"
@@ -186,6 +241,8 @@ def get_data(bbox=None, read_log=None, create_log=None):
             w_log = open(create_log, "w")
         else:
             w_log = None
+
+        passed_log = open("passed.log" , "a")
         while True:
             try:
                 resp = sess.get(url, headers=headers)
@@ -198,16 +255,18 @@ def get_data(bbox=None, read_log=None, create_log=None):
                 time.sleep(5)
                 continue
 
-            planes, old_keys = run_iteration(resp.text, planes, old_keys, w_log)
+            planes, old_keys, planes_passed = run_iteration(resp.text, planes, old_keys, w_log, my_pos)
+            if planes_passed:
+                passed_log.write("".join([str(plane)+"\n" for plane in planes_passed]))
             time.sleep(3)
     elif read_log:
         r_log = open(read_log, "r").read().split("}}}")[:-1]
         for row in r_log:
-            planes, old_keys = run_iteration(row+"}}}", planes, old_keys)
+            planes, old_keys, planes_passed = run_iteration(row+"}}}", planes, old_keys, my_pos=my_pos)
             time.sleep(3)
         print("LOG END")
 
-def run_iteration(resp, planes, old_keys, w_log=None):
+def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None):
     if w_log:
         w_log.write(resp+"\n")
     json_data = json.loads(resp)
@@ -218,7 +277,7 @@ def run_iteration(resp, planes, old_keys, w_log=None):
         if key[:2] == "24":
             data = json_data[key]
             if key in planes.keys():
-                planes[key].update(data)
+                planes[key].update(data, my_pos)
                 planes[key].get_change()
                 planes[key].set_prev()
             else:
@@ -228,7 +287,7 @@ def run_iteration(resp, planes, old_keys, w_log=None):
     for key in planes.keys():
         if key not in p_count and key not in old_keys.keys():
             old_keys[key] = time.time()
-            planes[key].update_conn("OFFLINE$F")
+            planes[key].update_conn("SIGNAL LOSS$F")
         elif key in p_count and key in old_keys.keys():
             del old_keys[key]
             planes[key].update_conn("ONLINE$G")
@@ -246,8 +305,12 @@ def run_iteration(resp, planes, old_keys, w_log=None):
     planes_list.sort(key=lambda x: x.callsign, reverse=False)
     plane_stats = [plane.stats for plane in planes_list]+[["Planes", f"No. {len(planes_list)}", f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}"]]
     print_blocks(plane_stats)
-    return planes, old_keys
+    return planes, old_keys, [plane.passed_me for plane in planes_list if plane.passed_me]
 
 args = parse_args()
-get_data(bbox=args.bbox)
-#get_data(read_log="log.txt")
+if args.mode == "online":
+    get_data(bbox=args.bbox, create_log=args.write_log)
+elif args.mode == "log":
+    get_data(read_log=args.log_path)
+else:
+    print("you got to provide mode")

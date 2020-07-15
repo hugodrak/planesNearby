@@ -117,6 +117,7 @@ B78X;781;Boeing 787-10
 BA11;B11;British Aerospace (BAC) One Eleven
 BCS1;221;Airbus A220-100
 BCS3;223;Airbus A220-300
+BE20;;Beechcraft 200 Super King Air
 BE55;N/A;Beechcraft Baron / 55 Baron
 BE58;N/A;Beechcraft Baron / 58 Baron
 BELF;SHB;Shorts SC-5 Belfast

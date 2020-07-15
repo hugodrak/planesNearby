@@ -2,6 +2,7 @@ SAS;Scandinavian
 APF;Amapola
 FIN;Finair
 DFL;Babcock AirAmbulance
+BNO;Babcock AirAmbulance
 LPA;Air Leap
 QTR;Quatar Airways
 ATO;UTBILDNING
@@ -12,3 +13,5 @@ VLG;Vueling
 TVS;Smart Wings
 IBE;Iberia
 BAW;British Airways
+AFR;Air France
+ICE;Iceland Air
