@@ -6,6 +6,7 @@ import argparse
 import geocoder
 from geopy.distance import distance
 from weather_calc import cloud_get
+from radar import draw_radar
 
 
 def parse_args():
@@ -274,7 +275,7 @@ def get_data(bbox=None, read_log=None, create_log=None):
         except KeyboardInterrupt:
             print("\tI am done. Have a nice day! :)")
             pass
-            
+
     elif read_log:
         r_log = open(read_log, "r").read().split("}}}")[:-1]
         for row in r_log:
@@ -288,6 +289,7 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0):
     json_data = json.loads(resp)
     json_keys = json_data.keys()
     print(chr(27) + "[2J")
+
     p_count = []
     for key in json_keys:
         if key[:2] == "24":
@@ -319,6 +321,10 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0):
 
     planes_list = [plane for _, plane in planes.items()]
     planes_list.sort(key=lambda x: x.callsign, reverse=False)
+
+    draw_radar(args.bbox, my_pos, [[plane.lat, plane.lon] for plane in planes_list])
+
+
     plane_stats = [plane.stats for plane in planes_list]+[["Planes", f"✈ No. {len(planes_list)}", f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}", f"CLOUD FLOOR: {int(weather[0])} ft", f"TEMP: {int(weather[1])} °C",  f"HUMIDITY: {int(weather[2])} %"]]
     print_blocks(plane_stats)
     return planes, old_keys, [plane.passed_me for plane in planes_list if plane.passed_me]
