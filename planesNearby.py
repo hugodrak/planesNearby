@@ -135,21 +135,41 @@ def lookup_type(type):
 
 def lookup_airport(airport):
     if airport != "":
-        rows = open("./airports.txt", "r").read().splitlines()
+        rows = open("./latest_airports.csv", "r").read().splitlines()
         for row in rows:
-            rowsplit = row.split(";")
-            if airport in [rowsplit[1], rowsplit[2]]:
-                return rowsplit[3]
+            rowsplit = row.split(",")
+            if len(rowsplit) > 3:
+                if airport in [rowsplit[0], rowsplit[1]]:
+                    return rowsplit[2]
+
+
+        rows = open("./airports.csv", "r").read().splitlines()
+        for row in rows:
+            rowsplit = row.split(",")
+            if len(rowsplit) > 3:
+                if airport in [rowsplit[0], rowsplit[1]]:
+                    open("./latest_airports.csv", "a").write(row+"\n")
+                    return rowsplit[2]
     return airport
 
-def lookup_company(company):
-    if company != "":
-        rows = open("./companies.txt", "r").read().splitlines()
+def lookup_airline(airline):
+    if airline != "":
+        rows = open("./latest_airlines.csv", "r").read().splitlines()
         for row in rows:
-            rowsplit = row.split(";")
-            if company == rowsplit[0]:
-                return rowsplit[1]
-    return company
+            rowsplit = row.split(",")
+            if len(rowsplit) > 3:
+                if airline == rowsplit[1]:
+                    return rowsplit[2]
+
+
+        rows = open("./airlines.csv", "r").read().splitlines()
+        for row in rows:
+            rowsplit = row.split(",")
+            if len(rowsplit) > 3:
+                if airline == rowsplit[1]:
+                    open("./latest_airlines.csv", "a").write(row+"\n")
+                    return rowsplit[2]
+    return airline
 
 
 class Plane:
@@ -157,7 +177,7 @@ class Plane:
         self.key = data[0]
         self.type = lookup_type(data[8])
         self.squawk = data[6]
-        self.company = lookup_company(data[18])
+        self.company = lookup_airline(data[18])
         self.node = data[7]
         self.reg = data[9]
         self.time = data[10]
@@ -244,7 +264,7 @@ def get_data(bbox=None, read_log=None, create_log=None):
     old_keys = {}
     my_pos = get_my_position()
     weather = cloud_get(my_pos)
-
+    bbox = f"{my_pos[0]+0.5},{my_pos[0]-0.5},{my_pos[1]-1.8},{my_pos[1]+1.8}"
     if bbox:
         url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={bbox}&faa=1&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1&maxage=14400&gliders=1&stats=1&enc=WPix0NeDQJ6xOmiczStTqq2XtL_YRMqUg86w4siPKdQ"
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0"}
@@ -268,7 +288,7 @@ def get_data(bbox=None, read_log=None, create_log=None):
                     time.sleep(5)
                     continue
 
-                planes, old_keys, planes_passed = run_iteration(resp.text, planes, old_keys, w_log, my_pos, weather=weather)
+                planes, old_keys, planes_passed = run_iteration(resp.text, planes, old_keys, w_log, my_pos, weather=weather, bbox=bbox)
                 if planes_passed:
                     passed_log.write("".join([str(plane)+"\n" for plane in planes_passed]))
                 time.sleep(3)
@@ -283,7 +303,7 @@ def get_data(bbox=None, read_log=None, create_log=None):
             time.sleep(3)
         print("LOG END")
 
-def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0):
+def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0, bbox=None):
     if w_log:
         w_log.write(resp+"\n")
     json_data = json.loads(resp)
@@ -321,8 +341,8 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0):
 
     planes_list = [plane for _, plane in planes.items()]
     planes_list.sort(key=lambda x: x.callsign, reverse=False)
-
-    draw_radar(args.bbox, my_pos, [[plane.lat, plane.lon] for plane in planes_list])
+    if bbox:
+        draw_radar(bbox, my_pos, [[plane.lat, plane.lon] for plane in planes_list])
 
 
     plane_stats = [plane.stats for plane in planes_list]+[["Planes", f"✈ No. {len(planes_list)}", f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}", f"CLOUD FLOOR: {int(weather[0])} ft", f"TEMP: {int(weather[1])} °C",  f"HUMIDITY: {int(weather[2])} %"]]
