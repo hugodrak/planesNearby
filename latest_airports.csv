@@ -36,3 +36,11 @@ BDU,ENDU,Bardufoss Airport,"Bardufoss, Norway",UTC+01:00,Mar-Oct
 RIX,EVRA,Riga International Airport,"Riga, Latvia"
 VKO,UUWW,Vnukovo International Airport,"Moscow, Russia"
 YKS,UEEE,Yakutsk Airport,"Yakutsk, Yakutia, Russia"
+LLA,ESPA,Luleå Airport (Kallax Airport),"Luleå, Sweden",UTC+01:00,Mar-Oct
+CDG,LFPG,Charles de Gaulle Airport (Roissy Airport),"Paris, Île-de-France, France",UTC+01:00,Mar–Oct
+AES,ENAL,"Ålesund Airport, Vigra","Ålesund, Norway",UTC+01:00,Mar-Oct
+KUN,EYKA,Kaunas International Airport,"Kaunas, Lithuania",UTC+02:00,Mar–Oct
+MHQ,EFMA,Mariehamn Airport,"Mariehamn, Åland Islands, Finland",UTC+02:00,Mar-Oct
+VIE,LOWW,Vienna International Airport,"Vienna, Austria"
+CPH,EKCH,"Copenhagen Airport, Kastrup","Copenhagen, Denmark",UTC+01:00,Mar–Oct
+SKP,LWSK,"Skopje ""Alexander the Great"" Airport","Skopje, North Macedonia"

@@ -263,10 +263,12 @@ def get_data(bbox=None, read_log=None, create_log=None):
     planes = {}
     old_keys = {}
     my_pos = get_my_position()
+    #my_pos = [59.632595, 17.922295]
     weather = cloud_get(my_pos)
     bbox = f"{my_pos[0]+0.5},{my_pos[0]-0.5},{my_pos[1]-1.8},{my_pos[1]+1.8}"
     if bbox:
         url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={bbox}&faa=1&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1&maxage=14400&gliders=1&stats=1&enc=WPix0NeDQJ6xOmiczStTqq2XtL_YRMqUg86w4siPKdQ"
+        print(url)
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0"}
         sess = requests.session()
         if create_log:
@@ -312,7 +314,7 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0, bb
 
     p_count = []
     for key in json_keys:
-        if key[:2] == "24":
+        if key[:1] == "2":
             data = json_data[key]
             if key in planes.keys():
                 planes[key].update(data, my_pos)
@@ -345,7 +347,7 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0, bb
         draw_radar(bbox, my_pos, [[plane.lat, plane.lon] for plane in planes_list])
 
 
-    plane_stats = [plane.stats for plane in planes_list]+[["Planes", f"✈ No. {len(planes_list)}", f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}", f"CLOUD FLOOR: {int(weather[0])} ft", f"TEMP: {int(weather[1])} °C",  f"HUMIDITY: {int(weather[2])} %"]]
+    plane_stats = [plane.stats for plane in planes_list]+[["Planes", f"✈ No. {len(planes_list)}", f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}", f"CLOUD FLOOR: {int(weather[0])} ft", f"TEMP: {int(weather[1])} °C",  f"HUMIDITY: {int(weather[2])} %", f"My Pos: {my_pos}"]]
     print_blocks(plane_stats)
     return planes, old_keys, [plane.passed_me for plane in planes_list if plane.passed_me]
 
