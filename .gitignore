@@ -3,3 +3,4 @@ log.*
 .DS_store
 __pycache__/
 latest_*
+*.token

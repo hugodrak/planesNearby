@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def print_matrix(matrix):
     print(" -"*len(matrix[0]))
     for row in matrix:
@@ -21,6 +22,7 @@ def print_matrix(matrix):
         print("|" + " ".join(str_row) + "|")
     print(" -"*len(matrix[0]))
 
+
 def get_index(bbox, res, pos, shape):
     if bbox[1] < pos[0] < bbox[0] and bbox[2] < pos[1] < bbox[3]:
         row = int(abs(bbox[0]-pos[0])//res)
@@ -30,6 +32,7 @@ def get_index(bbox, res, pos, shape):
         return row, col
     else:
         return None
+
 
 def draw_radar(bbox_raw, my_pos, planes_pos, res=0.09):
     bbox = [float(val) for val in bbox_raw.split(",")]

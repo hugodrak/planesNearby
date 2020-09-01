@@ -3,8 +3,10 @@ import requests
 import json
 import os
 
+
 def get_weather(lat, lon):
-    api_key = os.environ["OPEN_WHEATHER_API_KEY"]
+    #api_key = os.environ["OPEN_WHEATHER_API_KEY"]
+    api_key = open("openweather.token", "r").read()
     url = "https://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s&units=metric" % (lat, lon, api_key)
 
     response = requests.get(url)
@@ -13,6 +15,7 @@ def get_weather(lat, lon):
     data = json.loads(response.text)["main"]
     return data["temp"], data["humidity"]
 
+
 def dew_point(temp, hum):
     a = 17.62
     b = 243.12
@@ -20,11 +23,24 @@ def dew_point(temp, hum):
     ts = (b*f/(a-f))
     return ts
 
+
 def cloud_base(temp, dew_p):
     return ((temp-dew_p)/2.444)*1000
+
 
 def cloud_get(pos):
     temp, hum = get_weather(pos[0], pos[1])
     dew_p = dew_point(temp, hum)
     cloud = cloud_base(temp, dew_p)
     return cloud, temp, hum
+
+
+def get_metar(icao):
+    key = open("avwx.token", "r").read()
+    url = f"https://avwx.rest/api/metar/{icao}?token={key}"
+    resp = requests.get(url)
+    if resp.status_code != 200:
+        return ""
+
+    data = json.loads(resp.text)["sanitized"]
+    return data
