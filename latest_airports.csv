@@ -63,4 +63,10 @@ LGW,EGKK,Gatwick Airport,"London, England, United Kingdom",UTC±00:00,Mar-Oct
 DUB,EIDW,Dublin Airport,"Dublin, Ireland",UTC±00:00,Mar-Oct
 KSD,ESOK,Karlstad Airport,"Karlstad, Sweden",UTC+01:00,Mar–Oct
 WRO,EPWR,Copernicus Airport Wrocław,"Wrocław, Poland"
-KVB,ESGR,Skövde Airport,"Skövde, Sweden",UTC+01:00,Mar–Oct
+KVB,ESGR,Skövde Airport,"Skövde, Sweden",UTC+01:00,Mar–OctMAN,EGCC,Manchester Airport,"Manchester, England, United Kingdom",UTC±00:00,Mar-Oct
+MAN,EGCC,Manchester Airport,"Manchester, England, United Kingdom",UTC±00:00,Mar-Oct
+JFK,KJFK,John F. Kennedy International Airport,"New York City, New York, United States",UTC−05:00,Mar-Nov
+DUS,EDDL,Düsseldorf Airport,"Düsseldorf, North Rhine-Westphalia, Germany",UTC+01:00,Mar-Oct
+TRD,ENVA,"Trondheim Airport, Værnes","Trondheim, Norway"
+LAX,KLAX,Los Angeles International Airport,"Los Angeles, California, United States",UTC−08:00,Mar-Nov
+BCN,LEBL,Barcelona–El Prat Airport,"Barcelona, Catalonia, Spain",UTC+01:00,Mar-Oct

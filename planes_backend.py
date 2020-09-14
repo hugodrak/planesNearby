@@ -5,7 +5,6 @@ import argparse
 import geocoder
 from geopy.distance import distance
 from weather_calc import cloud_get, get_metar
-from radar import draw_radar
 from terminalsize import get_terminal_size
 import platform
 
@@ -50,68 +49,6 @@ def calc_gps_distace(my_coord, second_coord):
             direction += "W"
 
     return dist, direction
-
-
-def get_color(code):
-    colors = {"B": '\033[94m', "G": '\033[92m', "W": '\033[93m', "F": '\033[91m',
-              "END": '\033[0m', "BOLD": '\033[1m',
-              "UNDER": '\033[4m', "M": '\033[95m'}
-    return colors[code]
-
-
-def add_margin(data_str, length, sign):
-    # TODO: should update to use r and l just
-    if len(data_str) > length:
-        data_str = data_str[:length]
-    margin = length - len(data_str)
-
-    if margin % 2 == 0:
-        out = sign * (margin // 2) + data_str + sign * (margin // 2)
-    else:
-        out = sign * (margin // 2) + data_str + sign * ((margin // 2) + 1)
-    return out
-
-
-def print_blocks(blocks):
-    str_blocks = []
-    for block in blocks:
-        template = "{title}\n{data}\n{bottom}"
-        if len(block) > 1:
-            data_list = []
-            for val in block[1:]:
-                val = str(val)
-                if "$" in val:
-                    val_split = val.split("$")
-                    if current_os == "Windows":
-                        data_list.append('|' + add_margin(val_split[0], block_width - 2, " ") + '|')
-                    else:
-                        color = get_color(val_split[1])
-                        data_list.append(
-                            f'|{color}' + add_margin(val_split[0], block_width - 2, " ") +
-                            f'{get_color("END")}|')
-                else:
-                    data_list.append('|' + add_margin(val, block_width - 2, " ") + '|')
-
-            data = "\n".join(data_list)
-        else:
-            data = '|' + add_margin("", block_width - 2, " ") + '|'
-        info = {"title": add_margin(str(block[0]), block_width, "_"),
-                "data": data,
-                "bottom": add_margin("", block_width, "-")}
-        str_blocks.append(template.format(**info))
-
-    cols = [[] for _ in range(blocks_wide)]
-
-    for i, block in enumerate(str_blocks):
-        block_rows = block.split("\n")
-        for br in block_rows:
-            cols[i % blocks_wide].append(br)
-    rows = []
-    for col in cols:
-        rows.extend([[] for r in range(1 + len(col) - len(rows)) if r > 0])
-        for i, item in enumerate(col):
-            rows[i].append(item)
-    print("\n".join([" ".join(r) for r in rows]))
 
 
 def print_stats(prev, limit, val, signs, unit, var, max_val=None):
@@ -277,118 +214,68 @@ class Plane:
         self.stats[6] = conn
 
 
-def get_data(bbox=None, read_log=None, create_log=None):
-    planes = {}
-    old_keys = {}
-    my_pos = get_my_position()
-    # my_pos = [59.632595, 17.922295]
-    weather = cloud_get(my_pos)
-    bbox = f"{my_pos[0] + 0.5},{my_pos[0] - 0.5},{my_pos[1] - 1.8},{my_pos[1] + 1.8}"
-    if bbox:
-        url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={bbox}" \
-              f"&faa=1&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1" \
-              f"&maxage=14400&gliders=1&stats=1&enc=WPix0NeDQJ6xOmiczStTqq2XtL_YRMqUg86w4siPKdQ"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0"}
-        sess = requests.session()
-        if create_log:
-            w_log = open(create_log, "w", encoding="utf8")
-        else:
-            w_log = None
+class Backend:
+    def __init__(self):
+        self.planes = {}
+        self.old_keys = {}
+        self.my_pos = get_my_position()
+        self.weather = cloud_get(self.my_pos)
+        self.bbox = f"{self.my_pos[0] + 0.5},{self.my_pos[0] - 0.5},{self.my_pos[1] - 1.8},{self.my_pos[1] + 1.8}"
+        if self.bbox:
+            self.url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={self.bbox}" \
+                  f"&faa=1&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1" \
+                  f"&maxage=14400&gliders=1&stats=1&enc=WPix0NeDQJ6xOmiczStTqq2XtL_YRMqUg86w4siPKdQ"
+            self.headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0"}
+            self.sess = requests.session()
 
-        passed_log = open("passed.log", "a", encoding="utf8")
-        current_metar = ""
-        if my_pos:
-            current_metar = get_metar(f"{my_pos[0]},{my_pos[1]}")
+            passed_log = open("passed.log", "a", encoding="utf8")
+            current_metar = ""
+            if self.my_pos:
+                self.current_metar = get_metar(f"{self.my_pos[0]},{self.my_pos[1]}")
 
+    def iterate(self):
         try:
-            while True:
-                try:
-                    resp = sess.get(url, headers=headers)
-                except IOError:
-                    print("Connection broke, retrying...")
-                    time.sleep(5)
-                    continue
-                if resp.status_code != 200:
-                    print(f"Status {resp.status_code}")
-                    time.sleep(5)
-                    continue
+            resp = self.sess.get(self.url, headers=self.headers)
+        except IOError:
+            print("Connection broke, retrying...")
+            return None
+        if resp.status_code != 200:
+            print(f"Status {resp.status_code}")
+            return None
 
-                planes, old_keys, planes_passed = run_iteration(resp.text, planes, old_keys, w_log,
-                                                                my_pos, weather=weather, bbox=bbox,
-                                                                metar=current_metar)
-                if planes_passed:
-                    passed_log.write("".join([str(plane) + "\n" for plane in planes_passed]))
-                time.sleep(3)
-        except KeyboardInterrupt:
-            print("\tI am done. Have a nice day! :)")
-            pass
+        json_data = json.loads(resp.text)
+        json_keys = json_data.keys()
 
-    elif read_log:
-        r_log = open(read_log, "r", encoding="utf8").read().split("}}}")[:-1]
-        for row in r_log:
-            planes, old_keys, planes_passed = run_iteration(row + "}}}", planes, old_keys,
-                                                            my_pos=my_pos, weather=weather)
-            time.sleep(3)
-        print("LOG END")
+        p_count = []
+        for key in json_keys:
+            if key[:1] == "2":
+                data = json_data[key]
+                if key in self.planes.keys():
+                    self.planes[key].update(data, self.my_pos)
+                    self.planes[key].get_change()
+                    self.planes[key].set_prev()
+                else:
+                    self.planes[key] = Plane(data, self.weather[0])
+                p_count.append(key)
 
+        for key in self.planes.keys():
+            if key not in p_count and key not in self.old_keys.keys():
+                self.old_keys[key] = time.time()
+                self.planes[key].update_conn("SIGNAL LOSS$F")
+            elif key in p_count and key in self.old_keys.keys():
+                del self.old_keys[key]
+                self.planes[key].update_conn("ONLINE$G")
 
-def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=(0, 0), bbox=None,
-metar=None):
-    if w_log:
-        w_log.write(resp + "\n")
-    json_data = json.loads(resp)
-    json_keys = json_data.keys()
-    #print(chr(27) + "[2J")
+        removed = []
+        for old_key, old_time in self.old_keys.items():
+            if old_key not in removed:
+                if (time.time() - old_time) > 30.0:
+                    del self.planes[old_key]
+                    removed.append(old_key)
+        for rem in removed:
+            del self.old_keys[rem]
 
-    p_count = []
-    for key in json_keys:
-        if key[:1] == "2":
-            data = json_data[key]
-            if key in planes.keys():
-                planes[key].update(data, my_pos)
-                planes[key].get_change()
-                planes[key].set_prev()
-            else:
-                planes[key] = Plane(data, weather[0])
-            p_count.append(key)
+        planes_list = [plane for _, plane in self.planes.items()]
+        planes_list.sort(key=lambda x: x.callsign, reverse=False)
 
-    for key in planes.keys():
-        if key not in p_count and key not in old_keys.keys():
-            old_keys[key] = time.time()
-            planes[key].update_conn("SIGNAL LOSS$F")
-        elif key in p_count and key in old_keys.keys():
-            del old_keys[key]
-            planes[key].update_conn("ONLINE$G")
-
-    removed = []
-    for old_key, old_time in old_keys.items():
-        if old_key not in removed:
-            if (time.time() - old_time) > 30.0:
-                del planes[old_key]
-                removed.append(old_key)
-    for rem in removed:
-        del old_keys[rem]
-
-    planes_list = [plane for _, plane in planes.items()]
-    planes_list.sort(key=lambda x: x.callsign, reverse=False)
-    if bbox:
-        draw_radar(bbox, my_pos, [[plane.lat, plane.lon] for plane in planes_list])
-
-    plane_stats = [plane.stats for plane in planes_list] + [["Planes", f"✈ No. {len(planes_list)}",
-                                                             f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}",
-                                                             f"CLOUD FLOOR: {int(weather[0])} ft",
-                                                             f"TEMP: {int(weather[1])} °C",
-                                                             f"HUMIDITY: {int(weather[2])} %", f"My Pos: {my_pos}",
-                                                             f"{metar[:20]}",
-                                                             f"{metar[20:]}"]]
-    print_blocks(plane_stats)
-    return planes, old_keys, [plane.passed_me for plane in planes_list if plane.passed_me]
-
-
-args = parse_args()
-if args.mode == "online":
-    get_data(bbox=args.bbox, create_log=args.write_log)
-elif args.mode == "log":
-    get_data(read_log=args.log_path)
-else:
-    print("you got to provide mode")
+        return True
