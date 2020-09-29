@@ -70,3 +70,5 @@ DUS,EDDL,Düsseldorf Airport,"Düsseldorf, North Rhine-Westphalia, Germany",UTC+
 TRD,ENVA,"Trondheim Airport, Værnes","Trondheim, Norway"
 LAX,KLAX,Los Angeles International Airport,"Los Angeles, California, United States",UTC−08:00,Mar-Nov
 BCN,LEBL,Barcelona–El Prat Airport,"Barcelona, Catalonia, Spain",UTC+01:00,Mar-Oct
+ORB,ESOE,Örebro Airport,"Örebro, Sweden"
+AAL,EKYT,Aalborg Airport,"Aalborg, Denmark",UTC+01:00,Mar-Oct
