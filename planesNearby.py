@@ -178,7 +178,9 @@ def lookup_airline(airline):
 
 
 class Plane:
-    def __init__(self, data, cloud_height):
+    def __init__(self, id, data, cloud_height):
+        self.id = id
+        print(self.id)
         self.key = data[0]
         self.type = lookup_type(data[8])
         self.squawk = data[6]
@@ -201,7 +203,7 @@ class Plane:
         self.passed_me = []
         self.has_passed = False
         self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
-        self.stats = [f"{self.callsign}/{self.flightno}", "CRS$B", "LAT$B", "LON$B", "LVL$B", "SPD$B", "ONLINE$G",
+        self.stats = [f"{self.id}/{self.callsign}/{self.flightno}", "CRS$B", "LAT$B", "LON$B", "LVL$B", "SPD$B", "ONLINE$G",
                       self.departure, self.destination, self.type, self.company, "DIST", "LOOK TO"]
 
     def update(self, data, my_pos):
@@ -266,6 +268,7 @@ class Plane:
     def update_conn(self, conn):
         self.stats[6] = conn
 
+LATEST_ID = 1
 
 def get_data(bbox=None, read_log=None, create_log=None):
     planes = {}
@@ -273,7 +276,7 @@ def get_data(bbox=None, read_log=None, create_log=None):
     my_pos = get_my_position()
     # my_pos = [59.632595, 17.922295]
     weather = cloud_get(my_pos)
-    bbox = f"{my_pos[0] + 0.5},{my_pos[0] - 0.5},{my_pos[1] - 1.8},{my_pos[1] + 1.8}"
+    bbox = f"{my_pos[0] + 0.7},{my_pos[0] - 0.7},{my_pos[1] - 2.0},{my_pos[1] + 2.0}"
     if bbox:
         url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={bbox}&faa=1&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1&maxage=14400&gliders=1&stats=1&enc=WPix0NeDQJ6xOmiczStTqq2XtL_YRMqUg86w4siPKdQ"
         print(url)
@@ -336,7 +339,9 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0, bb
                 planes[key].get_change()
                 planes[key].set_prev()
             else:
-                planes[key] = Plane(data, weather[0])
+                global LATEST_ID
+                planes[key] = Plane(LATEST_ID, data, weather[0])
+                LATEST_ID += 1
             p_count.append(key)
 
     for key in planes.keys():
@@ -359,7 +364,7 @@ def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=0, bb
     planes_list = [plane for _, plane in planes.items()]
     planes_list.sort(key=lambda x: x.callsign, reverse=False)
     if bbox:
-        draw_radar(bbox, my_pos, [[plane.lat, plane.lon] for plane in planes_list])
+        draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list])
 
     plane_stats = [plane.stats for plane in planes_list] + [["Planes", f"✈ No. {len(planes_list)}",
                                                              f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}",

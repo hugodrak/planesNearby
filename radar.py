@@ -7,11 +7,11 @@ def print_matrix(matrix):
         str_row = []
         remove = 0
         for col in row:
-            if col == 1:
+            if col == 9999:
                 val = "웃"
                 remove += 1
-            elif col == 2:
-                val = "•"
+            elif col > 0:
+                val = str(col)
             else:
                 if remove > 0:
                     remove -= 1
@@ -23,10 +23,10 @@ def print_matrix(matrix):
     print(" -"*len(matrix[0]))
 
 
-def get_index(bbox, res, pos, shape):
-    if bbox[1] < pos[0] < bbox[0] and bbox[2] < pos[1] < bbox[3]:
-        row = int(abs(bbox[0]-pos[0])//res)
-        col = int(abs(pos[1]-bbox[2])//res)
+def get_index(bbox, res, plane, shape):
+    if bbox[1] < plane[0] < bbox[0] and bbox[2] < plane[1] < bbox[3]:
+        row = int(abs(bbox[0]-plane[0])//res)
+        col = int(abs(plane[1]-bbox[2])//res)
         if row >= shape[0] or col >= shape[1]:
             return None
         return row, col
@@ -45,11 +45,11 @@ def draw_radar(bbox_raw, my_pos, planes_pos, res=0.09):
     pos = get_index(bbox, res, my_pos, shape)
     if pos:
         row, col = pos[0], pos[1]
-        matrix[row][col] = 1
+        matrix[row][col] = 9999
 
     for plane in planes_pos:
         pos = get_index(bbox, res, plane, shape)
         if pos:
             row, col = pos[0], pos[1]
-            matrix[row][col] = 2
+            matrix[row][col] = plane[2]
     print_matrix(matrix)
