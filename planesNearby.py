@@ -7,7 +7,10 @@ from geopy.distance import distance
 from weather_calc import cloud_get, get_metar
 from radar import draw_radar
 from terminalsize import get_terminal_size
+from gps import gps_direction, plane_alt_angle
+from math import radians
 import platform
+import os
 
 
 def parse_args():
@@ -21,6 +24,14 @@ def parse_args():
     return parser.parse_args()
 
 
+def setup_cache():
+    if not os.path.exists("latest_airlines.csv"):
+        open("latest_airlines.csv", "w")
+
+    if not os.path.exists("latest_airports.csv"):
+        open("latest_airports.csv", "w")
+
+R = 6373.0  # radius of earth
 block_width = 30
 columns, rows = get_terminal_size()
 #rows, columns = os.popen('stty size', 'r').read().split()
@@ -31,25 +42,6 @@ current_os = platform.system()
 def get_my_position():
     g = geocoder.ip('me')
     return g.latlng
-
-
-def calc_gps_distace(my_coord, second_coord):
-    dist = round(distance(my_coord, second_coord).m * 0.001, 2)
-    direction = ""
-    ns_tuning = 0.002
-    ew_tuning = 0.002
-    if abs(my_coord[0] - second_coord[0]) > dist * ns_tuning:
-        if my_coord[0] < second_coord[0]:
-            direction += "N"
-        else:
-            direction += "S"
-    if abs(my_coord[1] - second_coord[1]) > dist * ew_tuning:
-        if my_coord[1] < second_coord[1]:
-            direction += "E"
-        else:
-            direction += "W"
-
-    return dist, direction
 
 
 def get_color(code):
@@ -190,7 +182,6 @@ def lookup_airline(airline):
 class Plane:
     def __init__(self, id, data, cloud_height):
         self.id = id
-        print(self.id)
         self.key = data[0]
         self.type = lookup_type(data[8])
         self.squawk = data[6]
@@ -209,26 +200,21 @@ class Plane:
         self.flightno = data[13]
         self.callsign = data[16]
         self.dist_to_me = 0
-        self.direction_rel_to_me = ""
+        self.angle_rel_me = ""
+        self.angle_rel_ground = ""
         self.passed_me = []
         self.has_passed = False
-<<<<<<< HEAD
         self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
         self.stats = [f"{self.id}/{self.callsign}/{self.flightno}", "CRS$B", "LAT$B", "LON$B", "LVL$B", "SPD$B", "ONLINE$G",
-=======
-        self.prev = [self.time, self.lat, self.lon, self.course, self.height,
-                     self.speed, self.dist_to_me]
-
-        self.stats = [f"{self.callsign}/{self.flightno}", "CRS$B", "LAT$B", "LON$B",
-                      "LVL$B", "SPD$B", "ONLINE$G",
->>>>>>> bcda3218f39b8e9de7f4402779f524a97d4ca07e
                       self.departure, self.destination, self.type, self.company, "DIST", "LOOK TO"]
 
     def update(self, data, my_pos):
         if my_pos:
-            dist, direction = calc_gps_distace(my_pos, (self.lat, self.lon))
-            self.dist_to_me = dist
-            self.direction_rel_to_me = direction
+            dist, direction = gps_direction(radians(my_pos[0]), radians(my_pos[1]), radians(self.lat), radians(self.lon))
+            self.dist_to_me = round(dist, 1)
+            self.angle_rel_me = str(round(direction, 1))
+            self.angle_rel_ground = str(round(plane_alt_angle(self.height, dist), 1))
+
         self.time = data[10]
         self.lat = data[1]
         self.lon = data[2]
@@ -274,7 +260,7 @@ class Plane:
             if self.has_passed:
                 cloud_status += "$G"
 
-        self.stats[12] = "LOOK TO: " + self.direction_rel_to_me + cloud_status
+        self.stats[12] = f"LOOK TO: {self.angle_rel_me},UP {self.angle_rel_ground} {cloud_status}"
 
     def set_prev(self):
         self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed,
@@ -380,7 +366,7 @@ metar=None):
         del old_keys[rem]
 
     planes_list = [plane for _, plane in planes.items()]
-    planes_list.sort(key=lambda x: x.callsign, reverse=False)
+    planes_list.sort(key=lambda x: x.id, reverse=False)
     if bbox:
         draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list])
 
@@ -396,6 +382,7 @@ metar=None):
 
 
 args = parse_args()
+setup_cache()
 if args.mode == "online":
     get_data(bbox=args.bbox, create_log=args.write_log)
 elif args.mode == "log":
