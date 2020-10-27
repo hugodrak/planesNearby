@@ -5,8 +5,8 @@ import shlex
 import struct
 import platform
 import subprocess
- 
- 
+
+
 def get_terminal_size():
     """ getTerminalSize()
      - get width and height of console
@@ -28,8 +28,8 @@ def get_terminal_size():
         tuple_xy = (80, 25)      # default value
     print(tuple_xy)
     return tuple_xy
- 
- 
+
+
 def _get_terminal_size_windows():
     try:
         from ctypes import windll, create_string_buffer
@@ -51,7 +51,7 @@ def _get_terminal_size_windows():
             return columns, 0
     except:
         pass
- 
+
 
 def _get_terminal_size_tput():
     # get terminal width
@@ -62,8 +62,8 @@ def _get_terminal_size_tput():
         return cols, rows
     except:
         pass
- 
- 
+
+
 def _get_terminal_size_linux():
     def ioctl_GWINSZ(fd):
         try:
@@ -92,4 +92,4 @@ def _get_terminal_size_linux():
 
 if __name__ == "__main__":
     sizex, sizey = get_terminal_size()
-    print('width =', sizex, 'height =', sizey)
+    #print('width =', sizex, 'height =', sizey)

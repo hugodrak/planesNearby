@@ -16,6 +16,8 @@ def gps_direction(lat1, lon1, lat2, lon2, x_only=False):
     distance = R * c
 
     if not x_only:
+        if not -1 <= (lon_dist/distance) <= 1:
+            return distance, 0.0
         angle = degrees(acos(lon_dist/distance))
         if dlat > 0 and dlon > 0:
             angle = 90 - angle

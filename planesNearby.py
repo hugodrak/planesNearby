@@ -332,8 +332,10 @@ metar=None):
         w_log.write(resp + "\n")
     json_data = json.loads(resp)
     json_keys = json_data.keys()
-    #print(chr(27) + "[2J")
-
+    if current_os == "Windows":
+        os.system('cls')
+    else:
+        os.system('clear')
     p_count = []
     for key in json_keys:
         if key[:1] == "2":

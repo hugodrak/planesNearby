@@ -1,5 +1,6 @@
 import numpy as np
 
+## TODO: add airports within bbox to radar
 
 def print_matrix(matrix):
     print(" -"*len(matrix[0]))
@@ -42,14 +43,16 @@ def draw_radar(bbox_raw, my_pos, planes_pos, res=0.09):
     matrix = np.full((rows, columns), 0, dtype=int)
     shape = matrix.shape
 
-    pos = get_index(bbox, res, my_pos, shape)
-    if pos:
-        row, col = pos[0], pos[1]
-        matrix[row][col] = 9999
+
 
     for plane in planes_pos:
         pos = get_index(bbox, res, plane, shape)
         if pos:
             row, col = pos[0], pos[1]
             matrix[row][col] = plane[2]
+
+    fig_pos = get_index(bbox, res, my_pos, shape)
+    if fig_pos:
+        row, col = fig_pos[0], fig_pos[1]
+        matrix[row][col] = 9999
     print_matrix(matrix)
