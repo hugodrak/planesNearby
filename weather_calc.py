@@ -2,7 +2,7 @@ import numpy as np
 import requests
 import json
 import os
-
+import datetime
 
 def get_weather(lat, lon):
     #api_key = os.environ["OPEN_WHEATHER_API_KEY"]
@@ -35,6 +35,21 @@ def cloud_get(pos):
     return cloud, temp, hum
 
 
+def parse_metar(data):
+    out = []
+    out.append("T:" + data['time']['repr'][2:6])
+    out.append("Wind:"+data['wind_direction']['repr']+"|"+data['wind_speed']['repr'])
+    out.append("Vis:"+data['visibility']['repr'])
+    clds = []
+    for cloud in data['clouds']:
+        clds.append(cloud['repr'])
+    out.append("CLDS:"+",".join(clds))
+    out.append("Temp:"+str(data['temperature']['value']))
+    out.append("Dew:"+str(data['dewpoint']['value']))
+    out.append("Alt:"+str(data['altimeter']['value']))
+    out.append("FR:"+data['flight_rules'])
+    return " ".join(out)
+
 def get_metar(icao):
     key = open("avwx.token", "r").read()
     url = f"https://avwx.rest/api/metar/{icao}?token={key}"
@@ -42,5 +57,5 @@ def get_metar(icao):
     if resp.status_code != 200:
         return ""
 
-    data = json.loads(resp.text)["sanitized"]
-    return data
+    data = json.loads(resp.text)#["sanitized"]
+    return parse_metar(data)

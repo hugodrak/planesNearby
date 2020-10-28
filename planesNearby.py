@@ -211,7 +211,7 @@ class Plane:
     def update(self, data, my_pos):
         if my_pos:
             dist, direction = gps_direction(radians(my_pos[0]), radians(my_pos[1]), radians(self.lat), radians(self.lon))
-            self.dist_to_me = round(dist, 1)
+            self.dist_to_me = round(dist/1.852, 1)  # to Nautical mile
             self.angle_rel_me = str(round(direction, 1))
             self.angle_rel_ground = str(round(plane_alt_angle(self.height, dist), 1))
 
@@ -242,9 +242,9 @@ class Plane:
             self.stats[5] = print_stats(self.prev[5], 1, self.speed, ["▼", "▲"], "kn", "SPD")
 
         if self.dist_to_me != self.prev[6]:
-            dist_s = print_stats(self.prev[6], 0.01, self.dist_to_me, ["▼", "▲"], "km", "DIST")
+            dist_s = print_stats(self.prev[6], 0.01, self.dist_to_me, ["▼", "▲"], "NM", "DIST")
             if dist_s != "":
-                if self.dist_to_me < 15:  # 15 km
+                if self.dist_to_me < 8:  # 15 km or 8 NM 
                     if not self.has_passed:
                         self.passed_me = [self.key, self.time, self.type, self.reg, self.departure,
                                           self.destination, self.height]
@@ -371,14 +371,15 @@ metar=None):
     planes_list.sort(key=lambda x: x.id, reverse=False)
     if bbox:
         draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list])
-
-    plane_stats = [plane.stats for plane in planes_list] + [["Planes", f"✈ No. {len(planes_list)}",
+    mv = block_width - 3 # max width
+    plane_stats = [plane.stats for plane in planes_list] + [["Planes", f"✈ Count. {len(planes_list)}",
                                                              f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}",
                                                              f"CLOUD FLOOR: {int(weather[0])} ft",
                                                              f"TEMP: {int(weather[1])} °C",
                                                              f"HUMIDITY: {int(weather[2])} %", f"My Pos: {my_pos}",
-                                                             f"{metar[:20]}",
-                                                             f"{metar[20:]}"]]
+                                                             f"{metar[:mv]}",
+                                                             f"{metar[mv:mv*2]}",
+                                                             f"{metar[mv*2:]}"]]
     print_blocks(plane_stats)
     return planes, old_keys, [plane.passed_me for plane in planes_list if plane.passed_me]
 

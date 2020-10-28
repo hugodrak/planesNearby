@@ -24,9 +24,9 @@ def get_terminal_size():
     if current_os in ['Linux', 'Darwin'] or current_os.startswith('CYGWIN'):
         tuple_xy = _get_terminal_size_linux()
     if tuple_xy is None:
-        print("default")
+        #print("default")
         tuple_xy = (80, 25)      # default value
-    print(tuple_xy)
+    #print(tuple_xy)
     return tuple_xy
 
 
@@ -47,7 +47,7 @@ def _get_terminal_size_windows():
         resp = os.popen('mode').read().splitlines()
         if resp:
             columns = resp[4].split()[1]
-            print("Columns:", columns)
+            #print("Columns:", columns)
             return columns, 0
     except:
         pass

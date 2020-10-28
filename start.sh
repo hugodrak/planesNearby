@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 ~/kode/planesNearby/planesNearby.py --mode online
+python3 planesNearby.py --mode online
