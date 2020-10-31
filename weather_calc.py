@@ -5,7 +5,6 @@ import os
 import datetime
 
 def get_weather(lat, lon):
-    #api_key = os.environ["OPEN_WHEATHER_API_KEY"]
     api_key = open("openweather.token", "r").read()
     url = "https://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s&units=metric" % (lat, lon, api_key)
 
@@ -50,12 +49,23 @@ def parse_metar(data):
     out.append("FR:"+data['flight_rules'])
     return " ".join(out)
 
-def get_metar(icao):
+def get_metar(coord):
     key = open("avwx.token", "r").read()
-    url = f"https://avwx.rest/api/metar/{icao}?token={key}"
+    url = f"https://avwx.rest/api/metar/{coord}?format=json&token={key}"
     resp = requests.get(url)
     if resp.status_code != 200:
         return ""
 
-    data = json.loads(resp.text)#["sanitized"]
-    return parse_metar(data)
+    data = json.loads(resp.text)
+    return parse_metar(data), data['station']
+
+
+def airport_coord(icao):
+    key = open("avwx.token", "r").read()
+    url = f"https://avwx.rest/api/station/{icao}?format=json&token={key}"
+    resp = requests.get(url)
+    if resp.status_code != 200:
+        return 0.0, 0.0
+
+    data = json.loads(resp.text)
+    return [[data['latitude'], data['longitude']]]

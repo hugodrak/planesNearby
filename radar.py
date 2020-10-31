@@ -11,6 +11,8 @@ def print_matrix(matrix):
             if col == 9999:
                 val = "웃"
                 remove += 1
+            elif col == 9998:
+                val = "A"
             elif col > 0:
                 val = str(col)
             else:
@@ -35,7 +37,7 @@ def get_index(bbox, res, plane, shape):
         return None
 
 
-def draw_radar(bbox_raw, my_pos, planes_pos, res=0.09):
+def draw_radar(bbox_raw, my_pos, planes_pos, res=0.09, airports=None):
     bbox = [float(val) for val in bbox_raw.split(",")]
 
     rows = int(abs(bbox[0]-bbox[1])//res)
@@ -46,10 +48,16 @@ def draw_radar(bbox_raw, my_pos, planes_pos, res=0.09):
 
 
     for plane in planes_pos:
-        pos = get_index(bbox, res, plane, shape)
-        if pos:
-            row, col = pos[0], pos[1]
+        ppos = get_index(bbox, res, plane, shape)
+        if ppos:
+            row, col = ppos[0], ppos[1]
             matrix[row][col] = plane[2]
+
+    for airport in airports:
+        ap_pos = get_index(bbox, res, airport, shape)
+        if ap_pos:
+            row, col = ap_pos[0], ap_pos[1]
+            matrix[row][col] = 9998
 
     fig_pos = get_index(bbox, res, my_pos, shape)
     if fig_pos:

@@ -4,7 +4,7 @@ import time
 import argparse
 import geocoder
 from geopy.distance import distance
-from weather_calc import cloud_get, get_metar
+from weather_calc import cloud_get, get_metar, airport_coord
 from radar import draw_radar
 from terminalsize import get_terminal_size
 from gps import gps_direction, plane_alt_angle
@@ -12,6 +12,7 @@ from math import radians
 import platform
 import os
 
+DEV = False
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -38,6 +39,23 @@ columns, rows = get_terminal_size()
 blocks_wide = int(columns) // block_width
 current_os = platform.system()
 
+def assign_id(ids):
+    if not ids:
+        return [1], 1
+    new_id = None
+    prev = None
+    for id in ids:
+        if prev:
+            if prev+1 != id:
+                new_id = prev+1
+                break
+        prev = id
+
+    if not new_id:
+        new_id = ids[-1]+1
+    ids.append(new_id)
+    ids.sort()
+    return ids, new_id
 
 def get_my_position():
     g = geocoder.ip('me')
@@ -205,7 +223,7 @@ class Plane:
         self.passed_me = []
         self.has_passed = False
         self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
-        self.stats = [f"{self.id}/{self.callsign}/{self.flightno}", "CRS$B", "LAT$B", "LON$B", "LVL$B", "SPD$B", "ONLINE$G",
+        self.stats = [f"{self.id}/{self.flightno}/{self.callsign}", "CRS$B", "LAT$B", "LON$B", "LVL$B", "SPD$B", "ONLINE$G",
                       self.departure, self.destination, self.type, self.company, "DIST", "LOOK TO"]
 
     def update(self, data, my_pos):
@@ -244,7 +262,7 @@ class Plane:
         if self.dist_to_me != self.prev[6]:
             dist_s = print_stats(self.prev[6], 0.01, self.dist_to_me, ["▼", "▲"], "NM", "DIST")
             if dist_s != "":
-                if self.dist_to_me < 8:  # 15 km or 8 NM 
+                if self.dist_to_me < 8:  # 15 km or 8 NM
                     if not self.has_passed:
                         self.passed_me = [self.key, self.time, self.type, self.reg, self.departure,
                                           self.destination, self.height]
@@ -269,13 +287,13 @@ class Plane:
     def update_conn(self, conn):
         self.stats[6] = conn
 
-LATEST_ID = 1
+LATEST_IDS = []
 
 def get_data(bbox=None, read_log=None, create_log=None):
     planes = {}
     old_keys = {}
+    airports = None
     my_pos = get_my_position()
-    # my_pos = [59.632595, 17.922295]
     weather = cloud_get(my_pos)
     bbox = f"{my_pos[0] + 0.7},{my_pos[0] - 0.7},{my_pos[1] - 2.0},{my_pos[1] + 2.0}"
     if bbox:
@@ -292,7 +310,8 @@ def get_data(bbox=None, read_log=None, create_log=None):
         passed_log = open("passed.log", "a", encoding="utf8")
         current_metar = ""
         if my_pos:
-            current_metar = get_metar(f"{my_pos[0]},{my_pos[1]}")
+            current_metar, icao = get_metar(f"{my_pos[0]},{my_pos[1]}")
+            airports = airport_coord(icao)
 
         try:
             while True:
@@ -309,7 +328,7 @@ def get_data(bbox=None, read_log=None, create_log=None):
 
                 planes, old_keys, planes_passed = run_iteration(resp.text, planes, old_keys, w_log,
                                                                 my_pos, weather=weather, bbox=bbox,
-                                                                metar=current_metar)
+                                                                metar=current_metar, airports=airports)
                 if planes_passed:
                     passed_log.write("".join([str(plane) + "\n" for plane in planes_passed]))
                 time.sleep(3)
@@ -327,15 +346,16 @@ def get_data(bbox=None, read_log=None, create_log=None):
 
 
 def run_iteration(resp, planes, old_keys, w_log=None, my_pos=None, weather=(0, 0), bbox=None,
-metar=None):
+metar=None, airports=None):
     if w_log:
         w_log.write(resp + "\n")
     json_data = json.loads(resp)
     json_keys = json_data.keys()
-    if current_os == "Windows":
-        os.system('cls')
-    else:
-        os.system('clear')
+    if not DEV:
+        if current_os == "Windows":
+            os.system('cls')
+        else:
+            os.system('clear')
     p_count = []
     for key in json_keys:
         if key[:1] == "2":
@@ -345,9 +365,9 @@ metar=None):
                 planes[key].get_change()
                 planes[key].set_prev()
             else:
-                global LATEST_ID
-                planes[key] = Plane(LATEST_ID, data, weather[0])
-                LATEST_ID += 1
+                global LATEST_IDS
+                LATEST_IDS, plane_id = assign_id(LATEST_IDS)
+                planes[key] = Plane(plane_id, data, weather[0])
             p_count.append(key)
 
     for key in planes.keys():
@@ -370,7 +390,7 @@ metar=None):
     planes_list = [plane for _, plane in planes.items()]
     planes_list.sort(key=lambda x: x.id, reverse=False)
     if bbox:
-        draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list])
+        draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list], airports=airports)
     mv = block_width - 3 # max width
     plane_stats = [plane.stats for plane in planes_list] + [["Planes", f"✈ Count. {len(planes_list)}",
                                                              f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}",

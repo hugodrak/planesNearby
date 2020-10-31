@@ -37,4 +37,4 @@ def plane_alt_angle(altitude, distance):
         return 0.0
     alt_metres = altitude/3.281
     angle = degrees(atan(alt_metres/(distance*1000)))
-    return angle
+    return angle    
