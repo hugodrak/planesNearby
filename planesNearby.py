@@ -222,7 +222,8 @@ class Plane:
         self.angle_rel_ground = ""
         self.passed_me = []
         self.has_passed = False
-        self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
+        #self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
+        self.prev = [self.time, 0.0, 0.0, 0.0, 0, 0.0, 0]
         self.stats = [f"{self.id}/{self.flightno}/{self.callsign}", "CRS$B", "LAT$B", "LON$B", "LVL$B", "SPD$B", "ONLINE$G",
                       self.departure, self.destination, self.type, self.company, "DIST", "LOOK TO"]
 
@@ -254,7 +255,7 @@ class Plane:
         if self.height < 20:
             self.stats[4] = "ON GROUND$W"
         elif self.height != self.prev[4]:
-            self.stats[4] = print_stats(self.prev[4], 10, self.height, ["▼", "▲"], "ft", "LVL")
+            self.stats[4] = print_stats(self.prev[4], 5, self.height, ["▼", "▲"], "ft", "LVL")
 
         if self.speed != self.prev[5]:
             self.stats[5] = print_stats(self.prev[5], 1, self.speed, ["▼", "▲"], "kn", "SPD")
