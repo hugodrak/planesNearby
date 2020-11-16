@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 planesNearby.py --mode online
+./venv/bin/python3 planesNearby.py --mode online

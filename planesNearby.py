@@ -13,7 +13,7 @@ import platform
 import os
 
 DEV = False
-
+##TODO: add bbox by nameing city then make bbox around that
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", required=True, help="online or log")
