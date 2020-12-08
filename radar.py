@@ -64,3 +64,14 @@ def draw_radar(bbox_raw, my_pos, planes_pos, res=0.09, airports=None):
         row, col = fig_pos[0], fig_pos[1]
         matrix[row][col] = 9999
     print_matrix(matrix)
+
+
+def height_view(planes):
+    # heigh, id , lat, lon
+    heights = {}
+    for plane in planes:
+        rh = str(plane.height//100)
+        if rh not in heights.keys():
+            heights[rh] = []
+        heights[rh].append(str(plane.id))
+    print(heights)

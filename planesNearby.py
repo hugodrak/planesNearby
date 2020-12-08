@@ -5,7 +5,7 @@ import argparse
 import geocoder
 from geopy.distance import distance
 from weather_calc import cloud_get, get_metar, airport_coord
-from radar import draw_radar
+from radar import draw_radar, height_view
 from terminalsize import get_terminal_size
 from gps import gps_direction, plane_alt_angle
 from math import radians
@@ -380,6 +380,8 @@ metar=None, airports=None):
         del old_keys[rem]
 
     planes_list = [plane for _, plane in planes.items()]
+    ## TODO: make module that from the south sees from the side the hight "lanes" and also count in the closeness to eachother
+    #height_view(planes_list)
     planes_list.sort(key=lambda x: x.id, reverse=False)
     if bbox:
         draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list], airports=airports)
@@ -388,7 +390,7 @@ metar=None, airports=None):
                                                              f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}",
                                                              f"CLOUD FLOOR: {int(weather[0])} ft",
                                                              f"TEMP: {int(weather[1])} °C",
-                                                             f"HUMIDITY: {int(weather[2])} %", f"My Pos: {my_pos}",
+                                                             f"HUMIDITY: {int(weather[2])} %", f"My Pos: {my_pos[0]}, {my_pos[1]}",
                                                              f"{metar[:mv]}",
                                                              f"{metar[mv:mv*2]}",
                                                              f"{metar[mv*2:]}"]]
