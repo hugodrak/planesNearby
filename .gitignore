@@ -7,3 +7,4 @@ latest_*
 .idea
 latest_*
 temp.*
+venv
