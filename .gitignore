@@ -6,3 +6,4 @@ latest_*
 *.token
 .idea
 latest_*
+temp.*

@@ -70,16 +70,7 @@ def get_color(code):
 
 
 def add_margin(data_str, length, sign):
-    # TODO: should update to use r and l just
-    if len(data_str) > length:
-        data_str = data_str[:length]
-    margin = length - len(data_str)
-
-    if margin % 2 == 0:
-        out = sign * (margin // 2) + data_str + sign * (margin // 2)
-    else:
-        out = sign * (margin // 2) + data_str + sign * ((margin // 2) + 1)
-    return out
+    return data_str.center(length, sign)
 
 
 def print_blocks(blocks):
