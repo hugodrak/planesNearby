@@ -3,17 +3,16 @@ import requests
 import time
 import argparse
 import geocoder
-from geopy.distance import distance
 from weather_calc import cloud_get, get_metar, airport_coord
 from radar import draw_radar, height_view
-from terminalsize import get_terminal_size
+from drawing import print_stats, current_os, status_box, print_blocks
 from gps import gps_direction, plane_alt_angle
 from math import radians
-import platform
 import os
 
 DEV = False
 ##TODO: add bbox by nameing city then make bbox around that
+## TODO: move functions to backend
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", required=True, help="online or log")
@@ -33,11 +32,6 @@ def setup_cache():
         open("latest_airports.csv", "w")
 
 R = 6373.0  # radius of earth
-block_width = 30
-columns, rows = get_terminal_size()
-#rows, columns = os.popen('stty size', 'r').read().split()
-blocks_wide = int(columns) // block_width
-current_os = platform.system()
 
 def assign_id(ids):
     if not ids:
@@ -57,88 +51,10 @@ def assign_id(ids):
     ids.sort()
     return ids, new_id
 
+
 def get_my_position():
     g = geocoder.ip('me')
     return g.latlng
-
-
-def get_color(code):
-    colors = {"B": '\033[94m', "G": '\033[92m', "W": '\033[93m', "F": '\033[91m',
-              "END": '\033[0m', "BOLD": '\033[1m',
-              "UNDER": '\033[4m', "M": '\033[95m'}
-    return colors[code]
-
-
-def add_margin(data_str, length, sign):
-    return data_str.center(length, sign)
-
-
-def print_blocks(blocks):
-    str_blocks = []
-    for block in blocks:
-        template = "{title}\n{data}\n{bottom}"
-        if len(block) > 1:
-            data_list = []
-            for val in block[1:]:
-                val = str(val)
-                if "$" in val:
-                    val_split = val.split("$")
-                    if current_os == "Windows":
-                        data_list.append('|' + add_margin(val_split[0], block_width - 2, " ") + '|')
-                    else:
-                        color = get_color(val_split[1])
-                        data_list.append(
-                            f'|{color}' + add_margin(val_split[0], block_width - 2, " ") +
-                            f'{get_color("END")}|')
-                else:
-                    data_list.append('|' + add_margin(val, block_width - 2, " ") + '|')
-
-            data = "\n".join(data_list)
-        else:
-            data = '|' + add_margin("", block_width - 2, " ") + '|'
-        info = {"title": add_margin(str(block[0]), block_width, "_"),
-                "data": data,
-                "bottom": add_margin("", block_width, "-")}
-        str_blocks.append(template.format(**info))
-
-    cols = [[] for _ in range(blocks_wide)]
-
-    for i, block in enumerate(str_blocks):
-        block_rows = block.split("\n")
-        for br in block_rows:
-            cols[i % blocks_wide].append(br)
-    rows = []
-    for col in cols:
-        rows.extend([[] for r in range(1 + len(col) - len(rows)) if r > 0])
-        for i, item in enumerate(col):
-            rows[i].append(item)
-    print("\n".join([" ".join(r) for r in rows]))
-
-
-def print_stats(prev, limit, val, signs, unit, var, max_val=None):
-    delta = prev - val
-    if max_val:
-        if abs(prev - val) > max_val // 2:
-            if val < prev:
-                delta = -(max_val - abs(val - prev))
-            else:
-                delta = (max_val - abs(val - prev))
-        else:
-            delta = prev - val
-
-    # if abs(delta) > limit:
-    p_delta = abs(round(delta, 2))
-    if type(val) == int:
-        val = format(val, ",d")
-
-    if delta < -0.01:
-        out = f"{var}: {val}{unit} |{signs[1]} {p_delta}{unit}"
-    elif delta > 0.01:
-        out = f"{var}: {val}{unit} |{signs[0]} {p_delta}{unit}"
-    else:
-        out = f"{var}: {val}{unit} |{' ' * len(signs[1])} {p_delta}{unit}"
-
-    return out
 
 
 def lookup_type(plane_type):
@@ -281,13 +197,16 @@ class Plane:
 
 LATEST_IDS = []
 
+
 def get_data(bbox=None, read_log=None, create_log=None):
     planes = {}
     old_keys = {}
     airports = None
     my_pos = get_my_position()
     weather = cloud_get(my_pos)
-    bbox = f"{my_pos[0] + 0.7},{my_pos[0] - 0.7},{my_pos[1] - 2.0},{my_pos[1] + 2.0}"
+    lat_ext = 0.7 # 0.7
+    lon_ext = 2.0 # 2.0
+    bbox = f"{my_pos[0] + lat_ext},{my_pos[0] - lat_ext},{my_pos[1] - lon_ext},{my_pos[1] + lon_ext}"
     if bbox:
         url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={bbox}" \
               f"&faa=1&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1" \
@@ -384,16 +303,10 @@ metar=None, airports=None):
     #height_view(planes_list)
     planes_list.sort(key=lambda x: x.id, reverse=False)
     if bbox:
-        draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list], airports=airports)
-    mv = block_width - 3 # max width
-    plane_stats = [plane.stats for plane in planes_list] + [["Planes", f"✈ Count. {len(planes_list)}",
-                                                             f"TIME: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}",
-                                                             f"CLOUD FLOOR: {int(weather[0])} ft",
-                                                             f"TEMP: {int(weather[1])} °C",
-                                                             f"HUMIDITY: {int(weather[2])} %", f"My Pos: {my_pos[0]}, {my_pos[1]}",
-                                                             f"{metar[:mv]}",
-                                                             f"{metar[mv:mv*2]}",
-                                                             f"{metar[mv*2:]}"]]
+        draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list], airports, planes_list)
+
+    status = status_box(len(planes_list), weather, my_pos, metar)
+    plane_stats = [plane.stats for plane in planes_list] + status
     print_blocks(plane_stats)
     return planes, old_keys, [plane.passed_me for plane in planes_list if plane.passed_me]
 
