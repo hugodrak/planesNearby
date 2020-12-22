@@ -1,7 +1,5 @@
 import numpy as np
 
-## TODO: add airports within bbox to radar
-
 
 def shape_radar_matrix(matrix):
     out = []
@@ -42,7 +40,6 @@ def print_matrix_lines(radar_lines, height_lines):
                 print(radar_lines[r_i] + height_lines[r_i-offset])
             else:
                 print(radar_lines[r_i+offset] + height_lines[r_i])
-        # fix for bigger also TODO
 
 
 def get_index(bbox, res, plane, shape):
@@ -105,8 +102,8 @@ def shape_height_chart(heights):
     out = [" FL: IDS"]
     for r_i in range(rows):
         fl = str(int(keys[r_i])*10)
-        if len(fl) == 2:
-            fl = "0"+fl
+        if len(fl) < 3:
+            fl = ("0"*(3-len(fl)))+fl
         line = [f" {fl}-"]
         for column in matrix[r_i]:
             if column == 0:
@@ -128,7 +125,7 @@ def find_nearest_int(table, value):
 def height_view(planes):
     # heigh, id , lat, lon
     heights = {}
-    heights_list = list(range(10)) + list(range(10, 20, 2)) + list(range(20, 55, 5))
+    heights_list = list(range(8)) + list(range(8, 20, 2)) + list(range(20, 50, 5))
     for h in heights_list:
         heights[h] = []
     for plane in planes:

@@ -4,7 +4,7 @@ import time
 import argparse
 import geocoder
 from weather_calc import cloud_get, get_metar, airport_coord
-from radar import draw_radar, height_view
+from radar import draw_radar
 from drawing import print_stats, current_os, status_box, print_blocks
 from gps import gps_direction, plane_alt_angle
 from math import radians
@@ -18,6 +18,7 @@ def parse_args():
     parser.add_argument("--mode", required=True, help="online or log")
     parser.add_argument("--bbox", default="59.781238,58.654034,15.793447,19.970999",
                         help="59.78,58.65,15.79,19.97")
+    parser.add_argument("--place", help="use this to name a place to center the planes around")
     parser.add_argument("--log-path", default="log.txt", help="path to log file")
     parser.add_argument("--write-log", default=None, help="path to log that will be created")
 
@@ -53,8 +54,15 @@ def assign_id(ids):
 
 
 def get_my_position():
-    g = geocoder.ip('me')
-    return g.latlng
+    me = geocoder.ip('me')
+    return me.latlng
+
+
+def get_city_pos(city):
+    resp = geocoder.arcgis(city)
+    if resp is None:
+        print("Bad geocode, taking you position.")
+    return resp.latlng
 
 
 def lookup_type(plane_type):
@@ -129,7 +137,6 @@ class Plane:
         self.angle_rel_ground = ""
         self.passed_me = []
         self.has_passed = False
-        #self.prev = [self.time, self.lat, self.lon, self.course, self.height, self.speed, self.dist_to_me]
         self.prev = [self.time, 0.0, 0.0, 0.0, 0, 0.0, 0]
         self.stats = [f"{self.id}/{self.flightno}/{self.callsign}", "CRS$B", "LAT$B", "LON$B", "LVL$B", "SPD$B", "ONLINE$G",
                       self.departure, self.destination, self.type, self.company, "DIST", "LOOK TO"]
@@ -195,6 +202,7 @@ class Plane:
     def update_conn(self, conn):
         self.stats[6] = conn
 
+
 LATEST_IDS = []
 
 
@@ -202,10 +210,15 @@ def get_data(bbox=None, read_log=None, create_log=None):
     planes = {}
     old_keys = {}
     airports = None
-    my_pos = get_my_position()
+    my_pos = None
+    if args.place:
+        my_pos = get_city_pos(args.place)
+    if not my_pos:
+        my_pos = get_my_position()
+
     weather = cloud_get(my_pos)
-    lat_ext = 0.7 # 0.7
-    lon_ext = 2.0 # 2.0
+    lat_ext = 0.7  # 0.7
+    lon_ext = 2.0  # 2.0
     bbox = f"{my_pos[0] + lat_ext},{my_pos[0] - lat_ext},{my_pos[1] - lon_ext},{my_pos[1] + lon_ext}"
     if bbox:
         url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={bbox}" \
@@ -299,9 +312,8 @@ metar=None, airports=None):
         del old_keys[rem]
 
     planes_list = [plane for _, plane in planes.items()]
-    ## TODO: make module that from the south sees from the side the hight "lanes" and also count in the closeness to eachother
-    #height_view(planes_list)
     planes_list.sort(key=lambda x: x.id, reverse=False)
+
     if bbox:
         draw_radar(bbox, my_pos, [[plane.lat, plane.lon, plane.id] for plane in planes_list], airports, planes_list)
 

@@ -5,4 +5,5 @@ then
     ./venv/bin/pip install -r requirements.txt
     echo "Venv setup Done!"
 fi
-./venv/bin/python3 planesNearby.py --mode online
+
+./venv/bin/python3 planesNearby.py --mode online --place $1
