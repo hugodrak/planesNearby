@@ -15,6 +15,8 @@ def shape_radar_matrix(matrix):
                 val = "A"
             elif col > 0:
                 val = str(col)
+                if len(val) > 1:
+                    remove += len(val) - 1
             else:
                 if remove > 0:
                     remove -= 1

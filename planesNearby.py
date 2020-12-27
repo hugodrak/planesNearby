@@ -116,9 +116,12 @@ class Plane:
     def __init__(self, id, data, cloud_height):
         self.id = id
         self.key = data[0]
+        self.show = True
         self.type = lookup_type(data[8])
         self.squawk = data[6]
         self.company = lookup_airline(data[18])
+        if self.type == "GRND":
+            self.show = False
         self.node = data[7]
         self.reg = data[9]
         self.time = data[10]
@@ -213,11 +216,13 @@ def get_data(bbox=None, read_log=None, create_log=None):
     my_pos = None
     if args.place:
         my_pos = get_city_pos(args.place)
+        print(my_pos)
+        my_pos = [round(my_pos[0], 3), round(my_pos[1], 3)]
     if not my_pos:
         my_pos = get_my_position()
 
     weather = cloud_get(my_pos)
-    lat_ext = 0.7  # 0.7
+    lat_ext = 0.9  # 0.7
     lon_ext = 2.0  # 2.0
     bbox = f"{my_pos[0] + lat_ext},{my_pos[0] - lat_ext},{my_pos[1] - lon_ext},{my_pos[1] + lon_ext}"
     if bbox:
@@ -311,7 +316,7 @@ metar=None, airports=None):
     for rem in removed:
         del old_keys[rem]
 
-    planes_list = [plane for _, plane in planes.items()]
+    planes_list = [plane for _, plane in planes.items() if plane.show == True]
     planes_list.sort(key=lambda x: x.id, reverse=False)
 
     if bbox:
