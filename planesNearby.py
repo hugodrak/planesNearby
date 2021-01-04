@@ -11,16 +11,15 @@ from math import radians
 import os
 
 DEV = False
-##TODO: add bbox by nameing city then make bbox around that
 ## TODO: move functions to backend
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", required=True, help="online or log")
+    parser.add_argument("--mode", default="online", help="online or log")
     parser.add_argument("--bbox", default="59.781238,58.654034,15.793447,19.970999",
                         help="59.78,58.65,15.79,19.97")
-    parser.add_argument("--place", help="use this to name a place to center the planes around")
     parser.add_argument("--log-path", default="log.txt", help="path to log file")
     parser.add_argument("--write-log", default=None, help="path to log that will be created")
+    parser.add_argument("--place", default=False, help="use this to name a place to center the planes around")
 
     return parser.parse_args()
 
@@ -216,7 +215,6 @@ def get_data(bbox=None, read_log=None, create_log=None):
     my_pos = None
     if args.place:
         my_pos = get_city_pos(args.place)
-        print(my_pos)
         my_pos = [round(my_pos[0], 3), round(my_pos[1], 3)]
     if not my_pos:
         my_pos = get_my_position()
