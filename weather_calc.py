@@ -24,7 +24,8 @@ def dew_point(temp, hum):
 
 
 def cloud_base(temp, dew_p):
-    return ((temp-dew_p)/2.444)*1000
+    calib = 1.188
+    return ((temp-dew_p)/2.444)*1000*calib
 
 
 def cloud_get(pos):
