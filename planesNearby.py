@@ -163,10 +163,10 @@ class Plane:
             self.stats[1] = print_stats(self.prev[3], 0, self.course, ["↺", "↻"], "°", "CRS", max_val=360)
 
         if self.lat != self.prev[1]:
-            self.stats[2] = print_stats(self.prev[1], 0.005, self.lat, ["◀", "▶"], "°", "LAT")
+            self.stats[2] = print_stats(self.prev[1], 0.005, self.lat,  ["▼", "▲"], "°", "LAT")
 
         if self.lon != self.prev[2]:
-            self.stats[3] = print_stats(self.prev[2], 0.005, self.lon, ["▼", "▲"], "°", "LON")
+            self.stats[3] = print_stats(self.prev[2], 0.005, self.lon, ["◀", "▶"], "°", "LON")
 
         if self.height < 20:
             self.stats[4] = "ON GROUND$W"
