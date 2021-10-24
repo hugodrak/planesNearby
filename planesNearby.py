@@ -11,7 +11,10 @@ from math import radians
 import os
 
 DEV = False
-## TODO: move functions to backend
+## TODO: move functions to backend 2
+## TODO: log is broken 3
+## TODO: add wttr style boxes   1
+## TODO: add hight curve (and maybe emiss trail) 4
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", default="online", help="online or log")
