@@ -33,21 +33,21 @@ def print_blocks(blocks):
                 if "$" in val:
                     val_split = val.split("$")
                     if current_os == "Windows":
-                        data_list.append('|' + add_margin(val_split[0], block_width - 2, " ") + '|')
+                        data_list.append('│' + add_margin(val_split[0], block_width - 2, " ") + '│')
                     else:
                         color = get_color(val_split[1])
                         data_list.append(
-                            f'|{color}' + add_margin(val_split[0], block_width - 2, " ") +
+                            f'│{color}' + add_margin(val_split[0], block_width - 2, " ") +
                             f'{get_color("END")}|')
                 else:
-                    data_list.append('|' + add_margin(val, block_width - 2, " ") + '|')
+                    data_list.append('│' + add_margin(val, block_width - 2, " ") + '│')
 
             data = "\n".join(data_list)
         else:
-            data = '|' + add_margin("", block_width - 2, " ") + '|'
-        info = {"title": add_margin(str(block[0]), block_width, "_"),
+            data = '│' + add_margin("", block_width - 2, " ") + '│'
+        info = {"title": add_margin(str(block[0]), block_width, "─"),
                 "data": data,
-                "bottom": add_margin("", block_width, "-")}
+                "bottom": add_margin("", block_width, "─")}
         str_blocks.append(template.format(**info))
 
     cols = [[] for _ in range(blocks_wide)]

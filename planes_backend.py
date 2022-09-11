@@ -220,6 +220,7 @@ class Backend:
         self.old_keys = {}
         self.my_pos = get_my_position()
         self.weather = cloud_get(self.my_pos)
+        self.last_update = time.time()
         self.bbox = f"{self.my_pos[0] + 0.5},{self.my_pos[0] - 0.5},{self.my_pos[1] - 1.8},{self.my_pos[1] + 1.8}"
         if self.bbox:
             self.url = f"https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds={self.bbox}" \
@@ -234,6 +235,10 @@ class Backend:
                 self.current_metar = get_metar(f"{self.my_pos[0]},{self.my_pos[1]}")
 
     def iterate(self):
+        curr_time = time.time()
+        if (curr_time - self.last_update) < 1:
+            time.sleep(1 - (curr_time - self.last_update))
+
         try:
             resp = self.sess.get(self.url, headers=self.headers)
         except IOError:
@@ -277,5 +282,5 @@ class Backend:
 
         planes_list = [plane for _, plane in self.planes.items()]
         planes_list.sort(key=lambda x: x.callsign, reverse=False)
-
+        self.last_update = time.time()
         return True

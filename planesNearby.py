@@ -15,6 +15,9 @@ DEV = False
 ## TODO: log is broken 3
 ## TODO: add wttr style boxes   1
 ## TODO: add hight curve (and maybe emiss trail) 4
+## TODO: add website interface
+## TODO: move to sqlite
+## TODO: add gui or maybe skip for website
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", default="online", help="online or log")
@@ -232,6 +235,7 @@ def get_data(bbox=None, read_log=None, create_log=None):
               f"&maxage=14400&gliders=1&stats=1&enc=WPix0NeDQJ6xOmiczStTqq2XtL_YRMqUg86w4siPKdQ"
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0"}
         sess = requests.session()
+        print(url)
         if create_log:
             w_log = open(create_log, "w", encoding="utf8")
         else:

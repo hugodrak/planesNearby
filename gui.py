@@ -1,37 +1,61 @@
 from tkinter import *
 import time
+from tkinter import messagebox
+import asyncio
 from planes_backend import Backend
-window = Tk()
+import threading
 
-window.title("PlanesNearby")
 
-header = Label(window, text='Hello')
-header.grid(column=0, row=0)
-
-#planes = [["SAS", "abc", "20kn"], ["NORW", "cde", "40kn"], ["lufth", "grf", "13kn"]]
 back = Backend()
-back.iterate()
-pids = back.planes.keys()
-plane_labels = []
-col = 0
-for pid in pids:
-    plane = back.planes[pid]
-    v = StringVar()
-    v.set(f"{plane.company}\n{plane.speed}")
-    plane_label = Label(window, textvariable=v)
-    plane_label.grid(column=col, row=1)
-    col += 1
-    plane_labels.append([plane_label, v])
 
-def clock():
+
+def _asyncio_thread(async_loop):
+    async_loop.run_until_complete(do_urls())
+    # async_loop.run_forever(do_urls())
+
+
+def do_tasks(async_loop):
+    """ Button-Event-Handler starting the asyncio part. """
+    threading.Thread(target=_asyncio_thread, args=(async_loop,)).start()
+
+
+async def update():
     back.iterate()
-    keys = list(back.planes.keys())
-    print("N")
-    for i, key in enumerate(keys):
-        string = back.planes[key].speed
-        plane_labels[i][1].set(string)
-        plane_labels[i][0].after(1000, clock)
+    return True
 
 
-clock()
-window.mainloop()
+async def do_urls():
+    """ Creating and starting 10 tasks. """
+    task = asyncio.create_task(update())
+    # tasks = [asyncio.create_task(one_url(url))]
+    res = await task
+    for key in back.planes.keys():
+        print(back.planes[key].speed)
+        INFO_STRING.set(str(back.planes[key].speed))
+        break
+
+
+
+def do_freezed():
+    messagebox.showinfo(message='Tkinter is reacting.')
+
+def main(async_loop):
+
+    window = Tk()
+
+    window.title("PlanesNearby")
+    Button(master=window, text='Asyncio Tasks', command=lambda: do_tasks(async_loop)).pack()
+    Button(master=window, text='Freezed???', command=do_freezed).pack()
+    Label(master=window, text='Hello').pack()
+    global INFO_STRING
+    INFO_STRING = StringVar()
+    #INFO_STRING.set(f"NONE")
+    Label(master=window, textvariable=INFO_STRING).pack()
+    window.mainloop()
+
+
+if __name__ == "__main__":
+    async_loop = asyncio.get_event_loop()
+    main(async_loop)
+
+
